@@ -1,0 +1,2686 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LV1 TESTING 03</title>
+<style>
+  :root{
+    --navy:rgb(47,85,151);
+    --navy-dark:rgb(32,60,108);
+    --blue:#1a56d6;
+    --blue-light:#3f7ee8;
+    --grey-line:#aab8c9;
+    --grey-bg:#eef1f5;
+    --text:#1f2430;
+    --border:#c7cfd9;
+    --green:#1e8e4a;
+    --red:#c0392b;
+    --gold:#d8a51d;
+    --header-height: 70px;
+    --footer-height: 70px;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;
+    font-family:"Segoe UI", Arial, Helvetica, sans-serif;
+    color:var(--text);
+    background:#fff;
+    height:100%;
+    overflow:hidden;
+  }
+  
+  #app-wrapper {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f0f2f5;
+  }
+  
+  #app {
+    width: 100%;
+    max-width: 1280px;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hidden{display:none !important;}
+  #quiz-screen{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    height:100%;
+    overflow:hidden;
+  }
+  #resultScreen{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    height:100%;
+  }
+
+  .quiz-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 24px;
+    min-height: var(--header-height);
+    max-height: var(--header-height);
+    height: var(--header-height);
+    flex-shrink: 0;
+    background: #fff;
+    border-bottom: 1px solid #e4e8ee;
+    z-index: 10;
+    gap: 8px;
+  }
+  .quiz-header .q-count{
+    font-size:16px;
+    font-weight:700;
+    color:#111;
+    white-space:nowrap;
+  }
+  .quiz-header .q-timer{
+    font-size:16px;
+    font-weight:400;
+    color:#111;
+    white-space:nowrap;
+  }
+  .quiz-header .q-timer.warn{color:var(--red);font-weight:700;}
+
+  .progress-track{
+    height:12px;
+    width:100%;
+    background:var(--grey-line);
+    flex-shrink: 0;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--navy);
+    transition:width .25s ease;
+  }
+
+  .dots-row{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    padding:8px 0 6px 0;
+    flex-shrink: 0;
+    min-height: 30px;
+  }
+  .dots-row .dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#d7dee6;
+    border:1px solid #d7dee6;
+  }
+  .dots-row .dot.filled{background:var(--navy);border-color:var(--navy);}
+
+  /* ===== FEEDBACK ĐÚNG / SAI CHO TỪNG CÂU ===== */
+  .answer-feedback{
+    margin:16px 0 4px;
+    padding:12px 16px;
+    border-radius:10px;
+    border:2px solid transparent;
+    font-size:16px;
+    font-weight:700;
+    line-height:1.45;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    max-width:900px;
+    box-sizing:border-box;
+  }
+  .answer-feedback.correct{
+    background:#e8f7ee;
+    color:#176b3a;
+    border-color:#79c99a;
+  }
+  .answer-feedback.wrong{
+    background:#fdecec;
+    color:#a52828;
+    border-color:#e58a8a;
+  }
+  .answer-feedback.unanswered{
+    background:#fff7df;
+    color:#7a5600;
+    border-color:#f0c75e;
+  }
+  .answer-feedback.unanswered .feedback-icon{background:#e0a800;}
+  .answer-feedback .feedback-icon{
+    width:28px;height:28px;min-width:28px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    color:#fff;font-size:17px;font-weight:800;
+  }
+  .answer-feedback.correct .feedback-icon{background:#1e8e4a;}
+  .answer-feedback.wrong .feedback-icon{background:#c0392b;}
+
+  /* ===== NỀN THÔNG BÁO CHƯA HOÀN THÀNH ===== */
+  #confirmSubmitModal{
+    background:rgba(15,25,45,.72) !important;
+    backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
+  }
+  #confirmSubmitModal .modal-box{
+    background:#ffffff !important;
+    color:#1f2430 !important;
+    border:2px solid #d8dee8 !important;
+    box-shadow:0 18px 50px rgba(0,0,0,.28) !important;
+  }
+  #confirmSubmitModal h2{
+    background:#fff4d6;
+    border:1px solid #f0cf73;
+    border-radius:10px;
+    padding:10px 12px;
+    margin:8px 0 12px !important;
+  }
+  #confirmSubmitModal #confirmSubmitText{
+    background:#f4f7fb;
+    border:1px solid #d8e0ea;
+    border-radius:8px;
+    padding:10px 12px;
+    color:#26364a !important;
+  }
+
+  .quiz-body{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    padding:10px 24px;
+    background:#fff;
+  }
+  .zoom-content{
+    transform-origin: top left;
+    width:100%;
+    height:auto;
+  }
+  .question-text{
+    font-size:16px;
+    line-height:1.5;
+    margin:4px 0 4px 0;
+    color:#111;
+  }
+  .question-note{
+    font-size:14px;
+    color:#333;
+    margin:2px 0 4px 0;
+  }
+  .content-wrap{padding-top:12px;}
+
+  .option-list{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    max-width:640px;
+  }
+  .option-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    cursor:pointer;
+    font-size:16px;
+  }
+  .option-row input{
+    width:18px;
+    height:18px;
+    accent-color:var(--blue);
+    cursor:pointer;
+    flex:none;
+  }
+  .option-row .opt-label{user-select:none;}
+  .option-row.selected .opt-label{font-weight:600;}
+
+  .option-grid-image{display:flex;gap:16px;flex-wrap:wrap;}
+  .option-image-card{
+    border:2px solid var(--border);
+    border-radius:6px;
+    padding:6px;
+    cursor:pointer;
+    width:150px;
+    text-align:center;
+  }
+  .option-image-card img{
+    width:100%;
+    border-radius:4px;
+    display:block;
+    margin-bottom:4px;
+  }
+  .option-image-card.selected{border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,86,214,.25);}
+
+  .single-with-media{
+    display:flex;
+    gap:24px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  .single-media-box{flex:0 0 auto;}
+  .single-media-box + .option-list{padding-top:4px;}
+
+  .tf-buttons{
+    display:flex;
+    gap:14px;
+    max-width:360px;
+  }
+  .tf-btn{
+    flex:1;
+    padding:12px 0;
+    text-align:center;
+    border:2px solid var(--border);
+    border-radius:6px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    background:#fff;
+  }
+  .tf-btn.selected{border-color:var(--blue);background:#eaf1ff;color:var(--blue);}
+
+  .group-tf-table{
+    width:100%;
+    border-collapse:collapse;
+    max-width:900px;
+    font-size:14px;
+  }
+  .group-tf-table th{
+    text-align:center;
+    font-weight:700;
+    padding:4px 12px;
+    border-bottom:2px solid var(--border);
+  }
+  .group-tf-table td{
+    padding:8px 12px;
+    border-bottom:1px solid #e4e8ee;
+    vertical-align:middle;
+  }
+  .group-tf-table td.statement{width:60%;}
+  .gtf-choice{display:flex;justify-content:center;}
+  .gtf-radio{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    border:2px solid var(--grey-line);
+    cursor:pointer;
+    display:inline-block;
+    position:relative;
+  }
+  .gtf-radio.checked{border-color:var(--blue);}
+  .gtf-radio.checked::after{
+    content:"";
+    position:absolute;
+    top:2px;
+    left:2px;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:var(--blue);
+  }
+
+  .match-wrap{
+    display:flex;
+    gap:0;
+    border-top:1px solid var(--border);
+    max-height: 400px;
+    overflow: auto;
+  }
+  .match-col{
+    flex:1;
+    padding:16px 20px;
+    position:relative;
+  }
+  .match-col.left-col{border-right:1px solid var(--border);}
+  .match-col h3{
+    font-size:18px;
+    margin:0 0 12px 0;
+    font-weight:700;
+  }
+  .left-items{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-width:320px;
+  }
+  .left-item{
+    border:2px solid var(--blue);
+    border-radius:6px;
+    padding:10px 12px;
+    font-size:14px;
+    cursor:grab;
+    background:#fff;
+    user-select:none;
+  }
+  .left-item.used{opacity:.35;cursor:not-allowed;border-style:dashed;}
+  .left-item.selected{background:#eaf1ff;box-shadow:0 0 0 2px rgba(26,86,214,.35);}
+  .left-item.dragging{opacity:.5;}
+
+  .right-groups-row{
+    display:flex;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .right-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-width:200px;
+  }
+  .right-group-label-col{
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:2px;
+  }
+  .right-group-inline{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:2px;
+  }
+  .right-group-inline .right-group-label-inline{
+    font-size:15px;
+    font-weight:700;
+    min-width:90px;
+  }
+  .drop-slot{
+    border:2px dashed #7fa6f0;
+    border-radius:6px;
+    min-height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    color:#8a93a3;
+    padding:4px 8px;
+    min-width:160px;
+    cursor:pointer;
+  }
+  .drop-slot.filled{
+    border-style:solid;
+    color:var(--text);
+    border-color:var(--blue);
+    background:#f5f8ff;
+    font-weight:600;
+  }
+  .drop-slot.correct{border-color:var(--green);background:#eafaf0;color:var(--green);}
+  .drop-slot.wrong{border-color:var(--red);background:#fdecea;color:var(--red);}
+  .drop-slot.drag-over{background:#dce8ff;}
+
+  .position-wrap{
+    max-width:960px;
+    position:relative;
+    display:inline-block;
+    margin-top:4px;
+  }
+  .position-target-area{
+    position:relative;
+    cursor:crosshair;
+    border:1px solid #d8dde5;
+    display: inline-block;
+    max-width: 100%;
+  }
+  .position-target-area img{
+    display:block;
+    max-width:100%;
+    height:auto;
+  }
+  .click-marker{
+    position:absolute;
+    width:22px;
+    height:22px;
+    margin-left:-11px;
+    margin-top:-11px;
+    border-radius:50%;
+    border:3px solid var(--blue);
+    background:rgba(26,86,214,.25);
+    pointer-events:none;
+  }
+  .click-marker.correct{border-color:var(--green);background:rgba(30,142,74,.25);}
+  .click-marker.wrong{border-color:var(--red);background:rgba(192,57,43,.25);}
+  .target-reveal{
+    position:absolute;
+    border:2px dashed var(--green);
+    background:rgba(30,142,74,.12);
+    pointer-events:none;
+  }
+
+  .mockup-img-wrap{
+    display:inline-block;
+    max-width:480px;
+    width:100%;
+  }
+  .mockup-img-wrap img{
+    display:block;
+    max-width:100%;
+    height:auto;
+    border:1px solid #d8dde5;
+    border-radius:4px;
+  }
+  .img-missing{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    width:100%;
+    max-width:520px;
+    min-height:140px;
+    border:2px dashed #c7cfd9;
+    border-radius:6px;
+    color:#8a93a3;
+    font-size:13px;
+    padding:16px;
+    background:#fafbfc;
+  }
+
+
+  /* Thông báo đúng / sai cho từng câu */
+  .question-feedback{display:flex;align-items:center;gap:10px;width:100%;max-width:760px;margin:18px 0 8px;padding:12px 16px;border-radius:10px;border:2px solid;font-size:15px;font-weight:700;line-height:1.45;animation:feedbackIn .2s ease-out;}
+  .question-feedback.correct{color:var(--green);background:#eafaf0;border-color:#8fd3aa;}
+  .question-feedback.wrong{color:var(--red);background:#fdecea;border-color:#e7a29a;}
+  .question-feedback .feedback-icon{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:none;background:currentColor;color:#fff;font-size:16px;}
+  .question-feedback.correct .feedback-icon::before{content:'✓';}
+  .question-feedback.wrong .feedback-icon::before{content:'✕';}
+  @keyframes feedbackIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Sửa nền cửa sổ Xem lại câu sai */
+  #reviewModal{background:rgba(15,20,30,.68);}
+  #reviewModal #reviewBox{background:#fff !important;color:var(--text);border:1px solid #d9e0e8 !important;box-shadow:0 18px 45px rgba(0,0,0,.22) !important;max-height:calc(100vh - 40px);overflow-y:auto;}
+  #reviewModal #reviewBox .question-text{background:#f7f9fc;border-left:4px solid var(--navy);border-radius:6px;padding:12px 14px;}
+  #reviewModal #reviewBox .review-answer-line{background:#fff;padding:9px 12px;border-radius:6px;margin:6px 0;border:1px solid #e4e8ee;}
+
+  .quiz-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 24px;
+    min-height: var(--footer-height);
+    max-height: var(--footer-height);
+    height: var(--footer-height);
+    flex-shrink: 0;
+    border-top:1px solid #e4e8ee;
+    background: #fff;
+    gap: 8px;
+  }
+  .link-summary{
+    color:var(--blue);
+    text-decoration:underline;
+    cursor:pointer;
+    font-size:14px;
+    background:none;
+    border:none;
+    padding:0;
+  }
+  .footer-buttons{
+    display:flex;
+    gap:8px;
+    flex-wrap:nowrap;
+  }
+  .btn{
+    padding:10px 22px;
+    border-radius:5px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    border:2px solid var(--navy);
+    white-space:nowrap;
+  }
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary:hover{background:var(--navy-dark);}
+  .btn-secondary{background:#fff;color:var(--navy);}
+  .btn-secondary:hover{background:#f0f2f6;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,20,30,.65);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  
+  /* =========================================================
+     NỀN ĐĂNG NHẬP: BẦU TRỜI XANH + MÂY CHUYỂN ĐỘNG
+     Chỉ áp dụng cho #loginModal, không ảnh hưởng màn hình làm bài.
+     ========================================================= */
+  #loginModal{
+    overflow:hidden;
+    isolation:isolate;
+    background:
+      radial-gradient(circle at 78% 16%, rgba(255,255,255,.34) 0 7%, transparent 7.5%),
+      linear-gradient(180deg,#4ea6f7 0%,#78c5ff 45%,#c8edff 100%);
+  }
+
+  /* Các đám mây chỉ thuộc layer nền, tuyệt đối không đè lên form */
+  #loginModal > .sky-cloud{
+    z-index:0 !important;
+  }
+  #loginModal > .modal-box{
+    position:relative;
+    z-index:10 !important;
+  }
+
+  #loginModal::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at 18% 20%, rgba(255,255,255,.20) 0 8%, transparent 8.5%),
+      radial-gradient(circle at 86% 72%, rgba(255,255,255,.16) 0 12%, transparent 12.5%);
+    animation:skyGlow 8s ease-in-out infinite alternate;
+  }
+
+  .sky-cloud{
+    position:absolute;
+    width:170px;
+    height:48px;
+    border-radius:50px;
+    background:rgba(255,255,255,.88);
+    filter:drop-shadow(0 7px 8px rgba(38,105,160,.10));
+    z-index:0;
+    pointer-events:none;
+    opacity:.9;
+  }
+  .sky-cloud::before,
+  .sky-cloud::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    background:inherit;
+  }
+  .sky-cloud::before{
+    width:72px;height:72px;
+    left:24px;top:-35px;
+  }
+  .sky-cloud::after{
+    width:58px;height:58px;
+    right:25px;top:-25px;
+  }
+  .cloud-1{top:13%;left:-190px;animation:cloudMove1 28s linear infinite;}
+  .cloud-2{top:29%;left:-230px;transform:scale(.72);animation:cloudMove2 38s linear infinite 4s;}
+  .cloud-3{top:66%;left:-200px;transform:scale(.58);opacity:.65;animation:cloudMove3 45s linear infinite 8s;}
+  .cloud-4{top:82%;left:-250px;transform:scale(.82);opacity:.58;animation:cloudMove4 34s linear infinite 12s;}
+
+  @keyframes cloudMove1{
+    from{left:-220px}
+    to{left:calc(100% + 220px)}
+  }
+  @keyframes cloudMove2{
+    from{left:-260px}
+    to{left:calc(100% + 260px)}
+  }
+  @keyframes cloudMove3{
+    from{left:-240px}
+    to{left:calc(100% + 240px)}
+  }
+  @keyframes cloudMove4{
+    from{left:-280px}
+    to{left:calc(100% + 280px)}
+  }
+  @keyframes skyGlow{
+    from{transform:scale(1);opacity:.75}
+    to{transform:scale(1.06);opacity:1}
+  }
+
+  /* Nhân vật trang trí: thay src bằng link ảnh PNG/GIF/WebP của bạn.
+     pointer-events:none để tuyệt đối không cản thao tác với form. */
+  .login-character{
+    position:absolute;
+    z-index:2;
+    pointer-events:none;
+    user-select:none;
+    object-fit:contain;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+    background:transparent !important;
+    animation:characterFloat 4s ease-in-out infinite;
+  }
+  .login-character.left{
+    width:min(210px,18vw);
+    max-width:210px;
+    left:2.5%;
+    bottom:5%;
+  }
+  .login-character.right{
+    width:min(190px,17vw);
+    max-width:190px;
+    right:2.5%;
+    bottom:7%;
+    animation-delay:-1.4s;
+  }
+  .login-character.top-right{
+    width:min(125px,12vw);
+    max-width:125px;
+    right:10%;
+    top:7%;
+    animation-delay:-2.2s;
+  }
+  @keyframes characterFloat{
+    0%,100%{transform:translateY(0) rotate(-1deg)}
+    50%{transform:translateY(-9px) rotate(1deg)}
+  }
+
+  /* =========================================================
+     CẬP NHẬT GIAO DIỆN ĐĂNG NHẬP (CARTOON & 3D BUTTON)
+     ========================================================= */
+
+  #loginModal .modal-box {
+    z-index:10;
+    background:rgba(255,255,255,.96);
+    border-radius: 24px;
+    border: 4px solid var(--navy-dark);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.25), 0 8px 0 var(--navy);
+    padding: 50px 32px 24px 32px;
+    position: relative;
+    max-width: 520px;
+    width: 100%;
+    margin-top: 60px; /* Nhường chỗ cho nhân vật */
+  }
+
+  .login-decor {
+    position: absolute;
+    top: -18%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 10;
+  }
+
+  .login-decor img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    /* Bạn có thể đổi đường dẫn URL bằng link ảnh nhân vật hoạt hình thật ở đây */
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect width="150" height="150" fill="%23eaf1ff"/><text x="50%" y="45%" font-size="14" font-weight="bold" text-anchor="middle" font-family="Arial" fill="%232f5597">Ảnh nhân vật</text><text x="50%" y="60%" font-size="12" text-anchor="middle" font-family="Arial" fill="%232f5597">(Gán link img)</text></svg>') no-repeat center center;
+    border: 6px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 6px 0 var(--border), 0 10px 15px rgba(0,0,0,0.15);
+    background-color: #eaf1ff;
+  }
+
+  #loginModal h2 {
+    text-align: center;
+    font-size: 26px;
+    color: var(--blue);
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 0px rgba(26,86,214,0.1);
+  }
+
+  .login-form {
+    max-width: 450px;
+    margin: 0 auto;
+  }
+  .login-form .form-group {
+    margin-bottom: 18px;
+  }
+  .login-form label {
+    display: block;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: var(--navy);
+  }
+  .login-form select,
+  .login-form input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 3px solid var(--border);
+    border-radius: 12px;
+    box-sizing: border-box;
+    background: #fff;
+    transition: all 0.2s;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .login-form select:focus,
+  .login-form input:focus {
+    border-color: var(--blue);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(26,86,214,0.15);
+  }
+  .login-form select:disabled,
+  .login-form input:disabled {
+    background: var(--grey-bg);
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+
+  /* Nút 3D Bắt đầu làm bài */
+  .login-form .btn-start {
+    width: 100%;
+    background: var(--blue-light);
+    color: #fff;
+    border: 3px solid var(--navy-dark);
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-top: 10px;
+    cursor: pointer;
+    box-shadow: 0 8px 0 var(--navy), 0 12px 15px rgba(0,0,0,0.2);
+    transition: all 0.15s ease;
+    letter-spacing: 1px;
+  }
+  .login-form .btn-start:hover {
+    background: var(--blue);
+    transform: translateY(2px);
+    box-shadow: 0 6px 0 var(--navy), 0 10px 12px rgba(0,0,0,0.2);
+  }
+  .login-form .btn-start:active {
+    transform: translateY(8px);
+    box-shadow: 0 0 0 var(--navy), 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .login-form .form-error {
+    color: var(--red);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    min-height: 18px;
+    margin-top: 4px;
+  }
+  .login-loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-weight: 600;
+  }
+  .login-loading .spinner {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    border: 4px solid var(--grey-line);
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  /* ========================================================= */
+
+  .summary-grid{
+    display:grid;
+    grid-template-columns:repeat(8,1fr);
+    gap:8px;
+    margin:14px 0;
+  }
+  .summary-cell{
+    aspect-ratio:1;
+    border-radius:6px;
+    border:2px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-weight:700;
+    font-size:13px;
+    background:#fff;
+    color:#555;
+  }
+  .summary-cell.answered{background:#eaf1ff;border-color:var(--blue);color:var(--blue);}
+  .summary-cell.current{border-color:var(--navy);box-shadow:0 0 0 2px rgba(47,85,151,.25);}
+
+  /* ===== FIX NỀN CỬA SỔ TÓM LƯỢC ===== */
+  #summaryModal.summary-modal-fixed{
+    position:fixed;
+    inset:0;
+    z-index:9998;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(15,27,45,.68);
+    backdrop-filter:blur(5px);
+    -webkit-backdrop-filter:blur(5px);
+  }
+  #summaryModal.summary-modal-fixed.hidden{display:none;}
+  #summaryModal .summary-box{
+    width:min(720px, calc(100vw - 40px));
+    max-height:min(82vh, 720px);
+    overflow:auto;
+    box-sizing:border-box;
+    padding:24px 28px;
+    margin:0;
+    border-radius:16px;
+    border:2px solid rgba(255,255,255,.85);
+    background:#ffffff !important;
+    color:#243447;
+    box-shadow:0 20px 60px rgba(0,0,0,.28);
+    opacity:1 !important;
+  }
+  #summaryModal .summary-box h2{
+    background:#f4f7fb;
+    border-radius:10px;
+    padding:12px 16px;
+  }
+  #summaryModal .legend{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:10px 12px;
+  }
+  #summaryModal .summary-grid{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:12px;
+  }
+  #summaryModal .modal-actions{
+    background:#fff;
+    padding-top:14px;
+  }
+  .modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:14px;
+  }
+  .legend{
+    display:flex;
+    gap:14px;
+    font-size:12px;
+    color:#555;
+    margin-bottom:4px;
+    flex-wrap:wrap;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:4px;}
+  .legend i{
+    width:12px;
+    height:12px;
+    border-radius:3px;
+    border:2px solid var(--border);
+    display:inline-block;
+  }
+  .legend i.a{background:#eaf1ff;border-color:var(--blue);}
+
+  .result-wrap{
+    max-width:760px;
+    margin:30px auto;
+    padding:0 20px;
+    text-align:center;
+  }
+  .trophy{font-size:80px;line-height:1;margin-bottom:4px;}
+  .score-big{
+    font-size:40px;
+    font-weight:800;
+    color:var(--navy);
+    margin:4px 0;
+  }
+  .score-sub{
+    font-size:15px;
+    color:#555;
+    margin-bottom:20px;
+  }
+  .result-actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+  }
+  .wrong-list{
+    text-align:left;
+    border-top:1px solid #e4e8ee;
+    padding-top:16px;
+  }
+  .wrong-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    border:1px solid #e4e8ee;
+    border-radius:6px;
+    margin-bottom:8px;
+  }
+  .wrong-item .wq-text{
+    font-size:13px;
+    max-width:70%;
+  }
+  .wrong-item button{
+    padding:6px 14px;
+    border-radius:5px;
+    border:2px solid var(--navy);
+    background:#fff;
+    color:var(--navy);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+  }
+
+  .review-answer-line{
+    margin:4px 0;
+    font-size:13px;
+  }
+  .review-answer-line.correct{color:var(--green);font-weight:600;}
+  .review-answer-line.wrong{color:var(--red);font-weight:600;}
+
+  .header-right {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .student-info {
+    font-size:13px;
+    color:#555;
+    background:var(--grey-bg);
+    padding:3px 10px;
+    border-radius:14px;
+    white-space:nowrap;
+  }
+  .zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .zoom-controls button {
+    border:1px solid var(--border);
+    background:#fff;
+    border-radius:4px;
+    padding:2px 6px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+    color:var(--navy);
+    transition:all 0.2s;
+    line-height:1.4;
+  }
+  .zoom-controls button:hover {
+    background:var(--grey-bg);
+  }
+  .zoom-controls .zoom-level {
+    font-size:12px;
+    color:#555;
+    min-width:38px;
+    text-align:center;
+  }
+  .fullscreen-btn {
+    border:2px solid var(--navy);
+    background:#fff;
+    color:var(--navy);
+    border-radius:5px;
+    width:32px;
+    height:32px;
+    font-size:15px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .fullscreen-btn:hover {
+    background:var(--grey-bg);
+  }
+
+  @media (max-width:760px){
+    #loginModal .modal-box{
+      max-width:calc(100vw - 28px);
+      padding:46px 20px 20px;
+      margin-top:42px;
+    }
+    .login-character.left{
+      width:115px;
+      left:-12px;
+      bottom:2%;
+    }
+    .login-character.right{
+      width:105px;
+      right:-8px;
+      bottom:3%;
+    }
+    .login-character.top-right{
+      width:72px;
+      right:3%;
+      top:4%;
+    }
+    .sky-cloud{transform:scale(.65);}
+    .cloud-2{transform:scale(.48);}
+    .cloud-3{transform:scale(.42);}
+    .cloud-4{transform:scale(.50);}
+
+    .match-wrap{flex-direction:column;max-height:300px;}
+    .match-col.left-col{border-right:none;border-bottom:1px solid var(--border);}
+    .summary-grid{grid-template-columns:repeat(5,1fr);}
+    .single-with-media{flex-direction:column;}
+    .login-form {padding:0 10px;}
+    .quiz-header {
+      flex-wrap:wrap;
+      min-height:auto;
+      height:auto;
+      padding:8px 16px;
+    }
+    .quiz-footer {
+      flex-wrap:wrap;
+      min-height:auto;
+      height:auto;
+      padding:8px 16px;
+    }
+    .header-right {
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .quiz-body {
+      padding:8px 16px;
+    }
+    :root {
+      --header-height: auto;
+      --footer-height: auto;
+    }
+  }
+  @media (max-width:480px){
+    .quiz-header .q-count{font-size:14px;}
+    .quiz-header .q-timer{font-size:14px;}
+    .btn{padding:6px 14px;font-size:13px;}
+    .option-row{font-size:14px;}
+    .dots-row{gap:5px;}
+    .dots-row .dot{width:8px;height:8px;}
+  }
+
+  .file-status {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 8px;
+    background: var(--grey-bg);
+  }
+  .file-status.success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+  .file-status.error { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb;}
+  .file-status.info { background: #d1ecf1; color: #0c5460; border: 2px solid #bee5eb; }
+
+  .letter-filter{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:10px;
+  }
+  .letter-btn{
+    width:32px;
+    height:32px;
+    line-height:28px;
+    text-align:center;
+    padding:0;
+    border:2px solid var(--border);
+    border-radius:8px;
+    background:#fff;
+    color:var(--text);
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    user-select:none;
+    transition: all 0.2s;
+  }
+  .letter-btn:hover{background:#eef1f5; transform: scale(1.05);}
+  .letter-btn.active{background:var(--blue);border-color:var(--blue);color:#fff; box-shadow: 0 4px 0 var(--navy); transform: translateY(-2px);}
+  .letter-btn.active:active {transform: translateY(2px); box-shadow: 0 0 0 var(--navy);}
+  .letter-btn.disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+  .letter-btn.all-btn{width:auto;padding:0 12px;}
+
+  .letter-btn.has-student{
+    background: color-mix(in srgb, var(--ltr-color) 14%, #fff);
+    border-color: var(--ltr-color);
+    color: var(--ltr-color);
+  }
+  .letter-btn.has-student:hover{
+    background: color-mix(in srgb, var(--ltr-color) 28%, #fff);
+  }
+  .letter-btn.has-student.active{
+    background: var(--ltr-color);
+    border-color: var(--ltr-color);
+    color:#fff;
+    box-shadow: 0 4px 0 rgba(0,0,0,.2);
+  }
+</style>
+</head>
+<body>
+<div id="app-wrapper">
+<div id="app">
+
+  <!-- ===== LOGIN MODAL ===== -->
+  <div id="loginModal" class="modal-overlay">
+    <!-- Mây nằm ở layer nền, phía sau form đăng nhập -->
+    <div class="sky-cloud cloud-1" aria-hidden="true"></div>
+    <div class="sky-cloud cloud-2" aria-hidden="true"></div>
+    <div class="sky-cloud cloud-3" aria-hidden="true"></div>
+    <div class="sky-cloud cloud-4" aria-hidden="true"></div>
+
+    <div class="modal-box">
+      
+      <!-- ===== NỀN TRANG TRÍ ĐĂNG NHẬP ===== -->
+      <div class="sky-sun" aria-hidden="true"></div>
+
+      <!--
+        3 VỊ TRÍ GÁN NHÂN VẬT.
+        Chỉ cần thay giá trị src="..." bằng link ảnh của bạn.
+        Khuyến nghị dùng PNG/GIF/WebP nền trong suốt.
+        pointer-events:none => nhân vật không chặn thao tác với form.
+      -->
+      <img class="login-character left"
+           src=""
+           alt=""
+           aria-hidden="true">
+      <img class="login-character right"
+           
+           alt=""
+           aria-hidden="true">
+      <img class="login-character top-right"
+           src=""
+           alt=""
+           aria-hidden="true">
+
+      <!-- NHÂN VẬT CHÍNH TRÊN FORM -->
+      <div class="login-decor">
+        <!-- Thay link tại src bên dưới nếu muốn đổi nhân vật chính -->
+        <img src="giphy.gif" alt="Decor" id="cartoonPlaceholder">
+      </div>
+
+      <h2>🏫 Đăng nhập</h2>
+      
+      <div id="loginLoading" class="login-loading">
+        <div class="spinner"></div>
+        <p style="margin-top:10px;">Đang tải danh sách học sinh...</p>
+      </div>
+      
+      <form class="login-form" id="loginForm" style="display:none;" autocomplete="off">
+        <div id="fileStatus" class="file-status info">📁 Đang kiểm tra file students.csv...</div>
+        
+        <div class="form-group" id="schoolGroup">
+          <label for="schoolSelect">Chọn trường</label>
+          <select id="schoolSelect">
+            <option value="">-- Chọn trường --</option>
+          </select>
+          <div class="form-error" id="schoolError"></div>
+        </div>
+        <div class="form-group">
+          <label for="classSelect">Chọn lớp</label>
+          <select id="classSelect" disabled>
+            <option value="">-- Vui lòng chọn trường trước --</option>
+          </select>
+          <div class="form-error" id="classError"></div>
+        </div>
+        <div class="form-group">
+          <label for="studentSelect">Chọn học sinh</label>
+          <div id="letterFilter" class="letter-filter"></div>
+          <select id="studentSelect" disabled>
+            <option value="">-- Vui lòng chọn lớp trước --</option>
+          </select>
+          <div class="form-error" id="studentError"></div>
+        </div>
+        
+        <div class="form-group" style="margin-top:12px;">
+          <button type="button" class="btn btn-primary btn-start" id="btnStartQuiz">START</button>
+        </div>
+        
+        <div class="form-error" id="loginError" style="text-align:center;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ SCREEN ===== -->
+  <!-- Phần dưới này giữ nguyên như bài code cũ của bạn -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-header">
+      <div class="q-count" id="qCount">Câu hỏi: 1/1</div>
+      <div class="header-right">
+        <div class="student-info" id="studentInfo"></div>
+        <div class="q-timer" id="qTimer">Thời gian còn: 00:50:00</div>
+        <div class="zoom-controls">
+          <button id="btnZoomOut" title="Thu nhỏ">−</button>
+          <span class="zoom-level" id="zoomLevel">100%</span>
+          <button id="btnZoomIn" title="Phóng to">+</button>
+        </div>
+        <button class="fullscreen-btn" id="btnFullscreen" title="Toàn màn hình">⛶</button>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="dots-row hidden" id="dotsRow"></div>
+
+    <div class="quiz-body">
+      <div class="zoom-content">
+        <div id="questionText"></div>
+        <div class="content-wrap" id="contentWrap"></div>
+      </div>
+    </div>
+
+    <div class="quiz-footer">
+      <button class="link-summary" id="btnSummary">Tới phần tóm lược</button>
+      <div class="footer-buttons">
+        <button class="btn btn-secondary" id="btnBack">Quay lại</button>
+        <button class="btn btn-primary" id="btnNext">Tiếp theo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SUMMARY MODAL ===== -->
+  <div id="summaryModal" class="modal-overlay hidden summary-modal-fixed">
+    <div class="modal-box summary-box">
+      <h2 style="text-shadow:none; color:var(--navy); font-weight: bold; margin-bottom: 15px;">Tóm lược câu hỏi</h2>
+      <div class="legend">
+        <span><i></i> Chưa trả lời</span>
+        <span><i class="a"></i> Đã trả lời</span>
+      </div>
+      <div class="summary-grid" id="summaryGrid"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="btnCloseSummary">Đóng</button>
+        <button class="btn btn-primary" id="btnSubmitFromSummary">Hoàn thành</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CONFIRM SUBMIT MODAL ===== -->
+  <div id="confirmSubmitModal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width:420px;text-align:center; border:none; padding:24px; border-radius:8px; margin-top:0; box-shadow:none;">
+      <div style="font-size:40px;margin-bottom:6px;">⚠️</div>
+      <h2 style="text-align:center; color: var(--navy); text-shadow:none; text-transform:none;">Bạn chưa hoàn thành tất cả các câu</h2>
+      <p id="confirmSubmitText" style="color:#444;font-size:15px;margin:8px 0 4px 0;"></p>
+      <p style="color:#666;font-size:14px;">Bạn có chắc muốn nộp bài không?</p>
+      <div class="modal-actions" style="justify-content:center;">
+        <button class="btn btn-secondary" id="btnCancelSubmit">Tiếp tục làm bài</button>
+        <button class="btn btn-primary" id="btnConfirmSubmit">Nộp bài ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RESULT SCREEN ===== -->
+  <div id="resultScreen" class="hidden">
+    <div class="result-wrap">
+      <div id="trophyBox"></div>
+      <div class="score-big" id="scoreBig"></div>
+      <div class="score-sub" id="scoreSub"></div>
+      <div class="result-actions">
+        <button class="btn btn-secondary" id="btnSendScore">📤 Nộp bài</button>
+        <button class="btn btn-primary" id="btnRetry">🔄 Làm lại</button>
+      </div>
+      <div id="sendStatus" style="font-size:13px;margin-bottom:20px;min-height:18px;"></div>
+      <div class="wrong-list" id="wrongList"></div>
+    </div>
+  </div>
+
+  <!-- ===== REVIEW MODAL ===== -->
+  <div id="reviewModal" class="modal-overlay hidden">
+    <div class="modal-box" id="reviewBox" style="max-width: 720px; padding: 24px 28px; border-radius: 8px; border: none; box-shadow: none; margin-top: 0;"></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* =========================================================
+   DỮ LIỆU HỌC SINH MẪU (FALLBACK)
+   ========================================================= */
+const DEFAULT_STUDENTS = [
+  { name: "Nguyễn Văn An", class: "10A1", school: "Trường mẫu" },
+  { name: "Trần Thị Bình", class: "10A1", school: "Trường mẫu" },
+  { name: "Lê Văn Cường", class: "10A2", school: "Trường mẫu" },
+  { name: "Phạm Thị Dung", class: "10A2", school: "Trường mẫu" },
+  { name: "Hoàng Văn Đức", class: "10A3", school: "Trường mẫu" },
+  { name: "Ngô Thị Hoa", class: "10A3", school: "Trường mẫu" }
+];
+
+/* =========================================================
+   QUIZ DATA & CẤU HÌNH
+   ========================================================= */
+const IMAGES = {
+  email: "email.png",
+  browser: "browser.png",
+};
+
+const SERVER_CONFIG = {
+  url: "https://script.google.com/macros/s/AKfycbxMV0t_gvxlfcFPct-mDywCPTwrJIcEcBYPAQ9D1_VWEpQOFFg1HryClHUgZmmhTeOO/exec",
+  fileName: "OT3_Test_L01",
+  schoolName: ""
+};
+
+function imgWithFallback(src, label, width, height){
+  const parts = [];
+  if(width) parts.push(`width:${width}px`);
+  if(height) parts.push(`height:${height}px`);
+  if(width && height) parts.push('object-fit:contain');
+  const style = parts.length ? ` style="${parts.join(';')}"` : '';
+  if(!src) return `<div class="img-missing"${style}>⚠ Chưa gắn ảnh cho: ${label}</div>`;
+  return `<img src="${src}" alt="${label}" data-key="${label}"${style} onerror="window.__imgFallback(this)">`;
+}
+window.__imgFallback = function(imgEl){
+  const div = document.createElement('div');
+  div.className = 'img-missing';
+  div.textContent = '⚠ Không tải được ảnh: ' + (imgEl.getAttribute('data-key')||'') + ' — kiểm tra lại đường link trong biến IMAGES/quizData.';
+  imgEl.replaceWith(div);
+};
+
+/* ---------------------------------------------------------
+   LƯU Ý: Phần quizData đã được rút gọn để code nhẹ nhàng hơn.
+   Bạn hãy copy & paste nguyên biến const quizData = [...]
+   từ file gốc của bạn vào thay thế mảng rỗng dưới đây nhé! 
+--------------------------------------------------------- */
+const quizData = [
+ { id: 1, type: "single", question: "Bạn nên sử dụng <span class='highlight'>ứng dụng</span> nào để <span class='highlight'>hiển thị ảnh, bản đồ và video</span> từ kỳ nghỉ hè của mình cho các bạn trong lớp học của bạn xem?", options: ["Bài trình chiếu (Slide Presentation)", "Tài liệu (Document)", "Áp phích (Poster)", "Trang tính (Spreadsheet)"], answer: 0 },
+  { id: 2, type: "position",
+      question: "Nhi muốn tham gia một trang mạng xã hội mới nổi tiếng. Để đăng ký, cô ấy phải điền vào một biểu mẫu trực tuyến. Nhi nên giữ phím nào trong khi gõ để chỉ viết hoa chữ cái đầu tiên trong tên của cô ấy?",
+      mockup: "img/LV1_OT3/2.png",
+      imageWidth: 1200,
+      target: { x: 6, y: 61, w: 13, h: 13 } },
+  { id: 3, type: "single", question: "Em hãy cho biết, cần sử dụng <span class='highlight'>phần mềm ứng dụng</span> nào để tạo ra các <span class='highlight'>chữ cái tiêu chuẩn</span> thay vì sử dụng máy đánh chữ?", options: ["Một ứng dụng CAD", "Một ứng dụng bảng tính", "Một ứng dụng trình chiếu", "Một ứng dụng xử lý văn bản"], answer: 3 },
+    { id: 4, type: "single",
+      question: "Em hãy cho biết đây là loại tập tin gì?",
+      mockup: "img/LV1_OT3/4.png",
+      imageWidth: 4000,
+      options: ["Một tài liệu (A document)", "Một trang tính (A spreadsheet)", "Một trang web (A web page)", "Một bài trình chiếu (A presentation)"],
+      answer: 0 },
+      { id: 5, type: "single", question: "Em hãy cho biết, <span class='highlight'>tổ hợp phím</span> nào sau đây được sử dụng để <span class='highlight'>chọn tất cả văn bản</span> trong cùng một tài liệu?", options: ["ALT + A", "TAB + A", "SHIFT + A", "CTRL + A"], answer: 3 },
+  { id: 6, type: "single", question: "Bạn đang tạo một áp phích trên máy tính. Bạn muốn <span class='highlight'>thay đổi giao diện</span> của các <span class='highlight'>chữ cái và số</span> trong tiêu đề áp phích. Bạn nên thay đổi điều gì?", options: ["Phông chữ (The Font)", "Dẫn cách đoạn văn (The Paragraph spacing)", "Kích thước trang (The Page size)", "Lề (The Margin)"], answer: 0 },
+  { id: 7, type: "single", question: "<span class='highlight'>Trolling</span> là gì?", options: ["Đăng nhập vào trang cá nhân của người khác và mạo danh người đó", "Cố gắng làm cho ai đó tức giận bằng cách đăng những điều có ý nghĩa về họ", "Chia sẻ thông tin cá nhân về ai đó mà không có sự cho phép của họ", "Cố tình bỏ ai đó ra ngoài"], answer: 1 },
+  { id: 8, type: "group_tf", question: "Tùy chọn nào sau đây là <span class='highlight'>Đúng</span>?", labels: ["Có", "Không"], items: [ { text: "Trực tuyến là mãi mãi", isTrue: true }, { text: "Bạn có thể xóa vĩnh viễn các tin nhắn độc hại hoặc các bài đăng trên mạng xã hội khỏi internet", isTrue: false }, { text: "Thông tin cá nhân như địa chỉ và số điện thoại không nên được đăng trực tuyến", isTrue: true }, { text: "Bạn nên gửi tin nhắn riêng cho bạn cùng lớp bằng mật khẩu của mình trong trường hợp bạn quên mật khẩu", isTrue: false } ] },
+  { id: 9, type: "single", question: "Bạn nhập tên của mình vào một công cụ tìm kiếm. <span class='highlight'>Kết quả tìm kiếm</span> bao gồm các <span class='highlight'>ảnh mà bạn đã xóa</span> khỏi trang web nơi bạn đã đăng chúng. Điều này có nghĩa là gì?", options: ["Dữ liệu công cụ tìm kiếm đã không được cập nhật gần đây", "Chủ sở hữu trang web vẫn chưa xóa xong ảnh", "Thông tin được đăng trực tuyến có thể được sao chép hoặc chia sẻ bởi những người khác", "Bạn cần làm mới trang kết quả tìm kiếm"], answer: 2 },
+  { id: 10, type: "single", question: "Tùy chọn nào đại diện cho một đặc điểm của <span class='highlight'>công dân kỹ thuật số tốt</span>?", options: ["Sử dụng \"P@ssW0rd\" làm mật khẩu cho tất cả các tài khoản của bạn", "Chia sẻ vị trí của bạn trên phương tiện truyền thông xã hội", "Lan truyền tin đồn trên mạng xã hội", "Biết giả sử mọi thứ bạn đăng sẽ được người khác nhìn thấy và chia sẻ"], answer: 3 },
+  { id: 11, type: "single", question: "Bạn thấy những <span class='highlight'>bình luận ác ý</span> trong một cuộc trò chuyện trong nhóm trực tuyến. Là một <span class='highlight'>công dân tốt</span> của thời đại kỷ nguyên số, bạn nên nói gì?", options: ["Chúng ta chỉ nên đăng những bình luận ác ý trong một cuộc trò chuyện riêng tư", "Bình luận ác ý là OK nếu chúng bị xóa sau khi nhóm đọc chúng", "Bạn có thể đăng những bình luận ác ý nếu người khác không nhìn thấy chúng", "Những bình luận này sẽ trực tuyến mãi mãi"], answer: 3 },
+  { id: 12, type: "group_tf", question: "Đối với mỗi phát biểu về việc <span class='highlight'>đăng thông tin trên internet</span>, bạn hãy chọn đáp án Đúng hoặc Sai cho mỗi phát biểu dưới đây.", labels: ["Đúng", "Sai"], items: [ { text: "Sẽ không ai nhìn thấy nội dung bạn đã đăng ngoại trừ những người theo dõi bạn", isTrue: false }, { text: "Xóa một hình ảnh hoặc video khỏi phương tiện truyền thông xã hội sẽ xóa nó vĩnh viễn", isTrue: false }, { text: "Những gì bạn đăng trên internet có thể ảnh hưởng đến những gì mọi người nghĩ về bạn", isTrue: true } ] },
+  { id: 13, type: "single", question: "Ai đó đã đăng một bình luận xấu tính trên mạng xã hội về bạn An. Bạn ấy đã xóa bình luận, nhưng cũng chính người đó đã viết những <span class='highlight'>bình luận ác ý</span> hơn. Một <span class='highlight'>thuật ngữ</span> cho người đã viết các ý kiến có nghĩa là gì?", options: ["Một người mạo danh - lừa đảo (A catfish)", "Bắt nạt trên mạng (A cyberbully)", "Một kẻ lừa đảo (A scammer)", "Một hacker (A hacker)"], answer: 1 },
+  { id: 14, type: "single", question: "Khi ai đó <span class='highlight'>sử dụng công nghệ để gây ác ý</span> với người khác, việc họ đang làm được gọi là gì?", options: ["Là một người hành động", "Trolling", "Bắt nạt trên mạng (Cyberbullying)", "Là một người ngoài cuộc"], answer: 2 },
+  { id: 15, type: "single", question: "Hành động nào là một ví dụ về <span class='highlight'>bắt nạt trên mạng</span>?", options: ["Tạo niềm vui cho một người bạn cùng lớp vào giờ ra chơi", "Thích một bài đăng trên phương tiện truyền thông xã hội của một người bạn cùng lớp mà bạn không biết", "Bị bỏ rơi khỏi cuộc trò chuyện vào bữa trưa", "Đăng tin nhắn ác ý về ai đó trên phương tiện truyền thông xã hội"], answer: 3 },
+  { id: 16, type: "single", question: "Bạn đang trò chuyện trực tuyến với một người bạn và một cuộc <span class='highlight'>tranh cãi nảy sinh</span>. Bạn nên làm gì?", options: ["Nhờ một người bạn khác hỗ trợ bạn", "Phớt lờ bạn bè của bạn cho đến khi họ ngừng nói chuyện", "Tìm bằng chứng để giành chiến thắng trong cuộc tranh luận", "Rời khỏi cuộc trò chuyện"], answer: 3 },
+  { id: 17, type: "single", question: "<span class='highlight'>Quyền riêng tư kỹ thuật số</span> là gì?", options: ["Che camera trên máy tính xách tay khi không sử dụng", "Sử dụng mật khẩu phức tạp", "Trở thành bạn bè trực tuyến chỉ với những người bạn biết trong thế giới thực", "Bảo vệ thông tin được lưu trữ hoặc chia sẻ trực tuyến"], answer: 3 },
+  { id: 18, type: "group_tf", question: "Đối với mỗi phát biểu về <span class='highlight'>tương tác kỹ thuật số</span>, hãy chọn Đúng hoặc Sai.", labels: ["Đúng", "Sai"], items: [ { text: "Thật an toàn khi chia sẻ tên đầy đủ và vị trí của bạn với bạn bè trực tuyến của bạn", isTrue: false }, { text: "Một công dân kỹ thuật số tốt sẽ xin phép trước khi chia sẻ ảnh của người khác", isTrue: true }, { text: "Bạn có thể đưa ra những nhận xét ác ý trực tuyến miễn là bạn không nói chúng trực tiếp", isTrue: false } ] },
+  { id: 19, type: "position",
+    question: "Bạn là đội trưởng của đội bóng đá. Bạn cần thay mặt đội bóng hỏi huấn luyện viên của mình một câu hỏi khẩn cấp. Bạn nên đặt URGENT ở đâu để đảm bảo rằng huấn luyện viên của bạn nhận được thông báo và mở email một cách nhanh chóng?",
+    mockup: "img/LV1_OT3/19.png",
+    imageWidth: 1200,
+    target: { x: 20, y: 21, w: 48, h: 10 } },
+  { id: 20, type: "single", question: "Nhi đã xây dựng một mô hình lớp học của mình như một bài tập về nhà. Bạn ấy muốn đưa nó cho <span class='highlight'>anh của bạn ấy, người sống ở xa</span>. Bạn ấy muốn chỉ cho anh ấy nơi bạn ấy ngồi và nói với anh ấy về giáo viên của bạn ấy và bạn bè của mình. Nhi nên <span class='highlight'>thể hiện và nói</span> với anh mình những điều này như thế nào?", options: ["Trong một bài đăng trên mạng xã hội", "Trong thông điệp email", "Trong tin nhắn văn bản", "Trong cuộc trò chuyện video"], answer: 3 },
+  { id: 21, type: "single", question: "Bạn đang nói chuyện với bạn bè trên thiết bị kỹ thuật số của mình. Với sự trợ giúp của camera tích hợp, bạn có thể <span class='highlight'>chủ động nhìn thấy bạn bè</span> của mình và bạn bè của bạn có thể nhìn thấy bạn. Bạn và bạn bè của bạn đang sử dụng hình thức <span class='highlight'>giao tiếp kỹ thuật số</span> nào?", options: ["Tin nhắn văn bản (Text message)", "Gọi điện thoại (Phone call)", "Gửi thư điện tử (Email)", "Trò chuyện video (Video chat)"], answer: 3 },
+  { id: 22, type: "single", question: "Bạn của bạn đã gửi một <span class='highlight'>tin nhắn điện tử ngắn</span> từ <span class='highlight'>điện thoại</span> của bạn ấy đến điện thoại của bạn. Tin nhắn chứa các chữ cái, số và biểu tượng cảm xúc. Bạn của bạn đã sử dụng hình thức giao tiếp kỹ thuật số nào?", options: ["Thông báo cập nhật", "Tin nhắn văn bản", "Gọi điện thoại", "Trò chuyện Video"], answer: 1 },
+  { id: 23, type: "match", question: "<span class='highlight'>Nối</span> mỗi từ với <span class='highlight'>định nghĩa</span> thích hợp.", left: ["Người nhận thư (To:)", "Nơi bạn nhập thông điệp", "Điều đầu tiên được đọc có thể không chính thức hoặc trang trọng", "Nêu chủ đề của email"], right: [ { label: "Người nhận (Recipient)", capacity: 1 }, { label: "Nội dung thư (Message Body)", capacity: 1 }, { label: "Lời chào (Greeting)", capacity: 1 }, { label: "Dòng chủ đề (Subject line)", capacity: 1 } ], correctMap: [0,1,2,3] },
+  { id: 24, type: "single", question: "Bạn hãy cho biết, điều gì sau đây là một <span class='highlight'>lợi thế</span> của việc sử dụng <span class='highlight'>email</span> thay vì tin nhắn tức thời?", options: ["Người nhận không cần phải online ngay lúc email được gửi", "Có thể chống lại virus", "Hỗ trợ biểu tượng cảm xúc (Emoticons)", "Có thể đính kèm hình ảnh"], answer: 0 },
+  { 
+    id: 25, 
+    type: "single", 
+    question: "An cần gửi email cảm ơn đến giáo viên của mình nhưng bạn ấy không biết nên sử dụng phông chữ nào. Phông chữ nào thích hợp nhất cho thông báo này?", 
+    options: [
+      "<img src='img/LV1_OT3/251.png' class='option-img' style='width:auto; height:100px; object-fit:contain;' alt='1'>",
+      "<img src='img/LV1_OT3/252.png' class='option-img' style='width:auto; height:100px; object-fit:contain;' alt='2'>",
+      "<img src='img/LV1_OT3/253.png' class='option-img' style='width:auto; height:100px; object-fit:contain;' alt='3'>",
+      "<img src='img/LV1_OT3/254.png' class='option-img' style='width:auto; height:100px; object-fit:contain;' alt='4'>",
+       ], 
+    answer: 3 
+  },
+  { id: 26, type: "match", question: "Bạn hãy chọn <span class='highlight'>cụm từ tương ứng</span> đúng với <span class='highlight'>thể loại câu</span> phù hợp.", left: ["Trân trọng,", "Kính gửi Cô Jackson,", "Chào buổi sáng,", "Kính thư,"], right: [ { label: "Câu kết thúc", capacity: 2 }, { label: "Câu chào hỏi", capacity: 2 } ], correctMap: [0,1,1,0] },
+  { id: 27, type: "single", question: "Bạn đang thực hiện một dự án nhóm vẽ động vật. Bạn cần <span class='highlight'>gửi hai bức ảnh</span> và hai đoạn vẽ thằn lằn cho <span class='highlight'>bạn cùng lớp</span> của bạn, người đang làm áp phích cho nhóm. Bạn nên gửi thông tin cho bạn cùng lớp của mình như thế nào?", options: ["Gửi bằng cách đăng trên phương tiện truyền thông xã hội", "Gửi bằng email", "Trò chuyện video", "Gửi bằng tin nhắn văn bản"], answer: 1 },
+  { id: 28, type: "position",
+    question: "Bạn cần gửi một email cho giáo viên của bạn. Bạn nên đặt địa chỉ email của giáo viên ở đâu? (Chọn vị trí chính xác trên ảnh)?",
+    mockup: "img/LV1_OT3/28.png",
+    imageWidth: 1200,
+    target: { x: 2, y: 1, w: 90, h: 10 } },
+    { id: 29, type: "position",
+    question: "Rian đang gửi cho cô Dung một email. Bạn ấy biết có năm phần quan trọng cần đưa vào email. Lời chào là phần nào? (Chọn phần thích hợp trong khu vực trả lời)",
+    mockup: "img/LV1_OT3/29.png",
+    imageWidth: 1200,
+    target: { x: 0, y: 25, w: 90, h: 8 } },
+  { id: 30, type: "single", question: "Nhi đang gặp bạn mình sau giờ học để học nhóm. Vào cuối giờ học, giáo viên của Nhi yêu cầu bạn ấy ở lại vài phút để giúp dọn dẹp bàn học. Nhi sẽ đến muộn để gặp bạn mình. <span class='highlight'>Cách nhanh nhất</span> để Nhi <span class='highlight'>nói với bạn mình</span> rằng bạn ấy sẽ <span class='highlight'>đến muộn</span> vài phút là gì?", options: ["Gửi tin nhắn văn bản (Text message)", "Trò chuyện video (Video chat)", "Đăng trên phương tiện truyền thông xã hội (Post on social media)", "Gửi email"], answer: 0 },
+  { id: 31, type: "single", question: "Giáo viên của bạn gửi một email để nhắc nhở phụ huynh rằng sẽ có một bài kiểm tra vào ngày mai. Bạn muốn sắp xếp một buổi học nhóm trước khi đến lớp. Bạn nhắn tin cho một người bạn, gọi cho người khác và trò chuyện video với người bạn thứ ba để sắp xếp thời gian và địa điểm học nhóm. <span class='highlight'>Quy trình</span> nào đang được sử dụng để <span class='highlight'>gửi và nhận thông tin</span>?", options: ["Thời gian sử dụng thiết bị (Screen time)", "Bắt nạt trên mạng (Cyberbullying)", "Cộng tác (Collaboration)", "Truyền thông kỹ thuật số (Digital communication)"], answer: 3 },
+  { id: 32, type: "single", question: "Hoạt động nào là một ví dụ về sự <span class='highlight'>hợp tác</span>?", options: ["Làm bài kiểm tra trong lớp học của bạn", "Ăn trưa trong nhà ăn", "Làm việc trong một dự án nhóm với các bạn cùng lớp", "Chạy một cuộc đua để đánh bại thời gian tốt nhất của bạn"], answer: 2 },
+  { id: 33, type: "single", question: "Bạn và hai người bạn cùng lớp đang làm việc cùng nhau trong một dự án. Nhiệm vụ của bạn là tạo ra một áp phích với thông tin về cá mập. Bạn sẽ in ra những bức ảnh của cá mập. Một người bạn sẽ mua bảng áp phích và điểm đánh dấu và người kia sẽ lắp ráp áp phích. (<span class='highlight'>Mục đích của việc phân chia</span> này là gì?)", options: ["Để thực hiện công việc nhanh nhất có thể", "Để hòa hợp với tư cách là một nhóm", "Để tạo áp phích với thông tin về cá mập", "Để in gọn gàng trên bảng áp phích"], answer: 2 },
+  { id: 34, type: "group_tf", question: "Đối với mỗi phát biểu về <span class='highlight'>mục tiêu cộng tác</span>, bạn hãy chọn Đúng hoặc Sai.", labels: ["Đúng", "Sai"], items: [ { text: "Học sinh học hỏi từ ý tưởng của người khác", isTrue: true }, { text: "Học sinh học cách giao tiếp với người khác", isTrue: true }, { text: "Học sinh học được rằng cách tốt nhất để làm việc là làm việc một mình", isTrue: false } ] },
+  { id: 35, type: "single", question: "Bạn đang nghiên cứu trực tuyến cho một bài tập về đại dương. Giáo viên của bạn đã hướng dẫn bạn bao gồm ít nhất ba sự kiện và không có ý kiến. Tùy chọn nào sau đây là một <span class='highlight'>ý kiến</span>?", options: ["Đại dương luôn chuyển động", "Đại dương tối tăm và đáng sợ", "Nhiều loại động vật sống trong đại dương", "Cá sống trong đại dương"], answer: 1 },
+  { id: 36, type: "single", question: "Kịch bản nào là một ví dụ về <span class='highlight'>cộng tác kỹ thuật số</span>?", options: ["Có một cuộc gọi video với nhóm học tập của bạn trước khi kiểm tra", "Đọc sách điện tử từ thư viện trực tuyến", "Thảo luận về một cuốn sách với nhóm đọc của bạn", "Tạo bản trình bày cho lớp học của bạn"], answer: 0 },
+  { id: 37, type: "single", question: "<span class='highlight'>Mục tiêu</span> là gì?", options: ["Thông tin an toàn để chia sẻ trực tuyến", "Một kết quả mà bạn muốn đạt được", "Một thực tế đã được chứng minh", "Thông tin mà bạn cho là đúng sự thật"], answer: 1 },
+  { id: 38, type: "single", question: "<span class='highlight'>Mục đích của sự cộng tác</span> (Collaboration) là gì?", options: ["Làm việc với những người khác để hướng tới một mục tiêu chung", "Làm việc chăm chỉ hơn các học sinh khác trong lớp", "Làm việc một mình để hoàn thành nhiệm vụ", "Trở thành học sinh nhanh nhất trong lớp"], answer: 0 }
+];
+
+const TOTAL_TIME = 50 * 60;
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let state = {
+  current: 0,
+  answers: {},
+  timeLeft: TOTAL_TIME,
+  timerHandle: null,
+  finished: false,
+  clickPos: {},
+  shuffleOrders: {},
+  studentName: '',
+  studentClass: '',
+  studentSchool: '',
+  isLoggedIn: false,
+  hasSubmitted: false,
+  feedbackShown: false
+};
+
+/* =========================================================
+   ZOOM CONTROL
+   ========================================================= */
+let currentZoom = 100;
+const MIN_ZOOM = 70;
+const MAX_ZOOM = 150;
+const ZOOM_STEP = 5;
+
+function applyZoom(zoomPercent) {
+  currentZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoomPercent));
+  const scale = currentZoom / 100;
+  const content = document.querySelector('.zoom-content');
+  if (content) {
+    content.style.transform = `scale(${scale})`;
+    content.style.transformOrigin = 'top left';
+    content.style.width = `${100 / scale}%`;
+  }
+  document.getElementById('zoomLevel').textContent = currentZoom + '%';
+  try { localStorage.setItem('quizZoom', currentZoom); } catch(e) {}
+}
+
+function zoomIn() { applyZoom(currentZoom + ZOOM_STEP); }
+function zoomOut() { applyZoom(currentZoom - ZOOM_STEP); }
+
+function loadZoomSetting() {
+  try {
+    const saved = localStorage.getItem('quizZoom');
+    if (saved) {
+      const zoom = parseInt(saved);
+      if (!isNaN(zoom) && zoom >= MIN_ZOOM && zoom <= MAX_ZOOM) {
+        applyZoom(zoom);
+        return;
+      }
+    }
+  } catch(e) {}
+  applyZoom(100);
+}
+
+/* =========================================================
+   QUẢN LÝ DỮ LIỆU HỌC SINH
+   ========================================================= */
+let studentData = [];
+let classList = [];
+let schoolList = [];
+let currentClassStudents = []; 
+
+function parseCSV(csvText) {
+  const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
+  if (lines.length < 2) return null;
+  
+  const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+  let nameIdx = -1, classIdx = -1, schoolIdx = -1;
+  
+  const nameKeywords = ['tên học sinh', 'tên', 'name', 'học sinh', 'student', 'full name', 'ten', 'ho ten', 'họ tên'];
+  for (const kw of nameKeywords) {
+    nameIdx = header.findIndex(h => h.includes(kw));
+    if (nameIdx !== -1) break;
+  }
+  
+  const classKeywords = ['lớp', 'class', 'lop', 'grade', 'classe'];
+  for (const kw of classKeywords) {
+    classIdx = header.findIndex(h => h.includes(kw));
+    if (classIdx !== -1) break;
+  }
+
+  const schoolKeywords = ['trường', 'school', 'truong'];
+  for (const kw of schoolKeywords) {
+    schoolIdx = header.findIndex(h => h.includes(kw));
+    if (schoolIdx !== -1) break;
+  }
+  
+  if (nameIdx === -1) nameIdx = 0;
+  if (classIdx === -1) classIdx = 1;
+  
+  const result = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map(c => c.trim());
+    if (cols.length > Math.max(nameIdx, classIdx)) {
+      const name = cols[nameIdx] || '';
+      const cls = cols[classIdx] || '';
+      const school = schoolIdx !== -1 ? (cols[schoolIdx] || '') : '';
+      if (name && cls) {
+        result.push({ name: name.trim(), class: cls.trim(), school: school.trim() });
+      }
+    }
+  }
+  return result.length > 0 ? result : null;
+}
+
+function showFileStatus(message, type = 'info') {
+  const el = document.getElementById('fileStatus');
+  if (el) {
+    el.textContent = message;
+    el.className = 'file-status ' + type;
+  }
+}
+
+function loadStudentData() {
+  const loadingEl = document.getElementById('loginLoading');
+  const formEl = document.getElementById('loginForm');
+  
+  loadingEl.style.display = 'block';
+  formEl.style.display = 'none';
+  
+  fetch('students.csv')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.text();
+    })
+    .then(csvText => {
+      const parsed = parseCSV(csvText);
+      if (parsed && parsed.length > 0) {
+        studentData = parsed;
+        showFileStatus(`✅ Đã tải thành công ${studentData.length} học sinh`, 'success');
+        finalizeStudentData();
+      } else {
+        throw new Error('Dữ liệu CSV không hợp lệ hoặc trống');
+      }
+    })
+    .catch(err => {
+      showFileStatus(`⚠ Không tìm thấy students.csv, dùng dữ liệu mẫu.`, 'error');
+      studentData = DEFAULT_STUDENTS.slice();
+      finalizeStudentData();
+    });
+}
+
+function finalizeStudentData() {
+  const seen = new Set();
+  studentData = studentData.filter(s => {
+    const key = s.school + '|' + s.name + '|' + s.class;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  
+  studentData.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+  schoolList = [...new Set(studentData.map(s => s.school || ''))].sort((a, b) => a.localeCompare(b, 'vi'));
+  
+  document.getElementById('loginLoading').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+  populateSchoolSelect();
+}
+
+function populateSchoolSelect() {
+  const select = document.getElementById('schoolSelect');
+  const schoolGroup = document.getElementById('schoolGroup');
+  select.innerHTML = '';
+
+  if (schoolList.length === 0 || (schoolList.length === 1 && schoolList[0] === '')) {
+    schoolGroup.classList.add('hidden');
+    populateClassSelect(''); 
+    return;
+  }
+
+  schoolGroup.classList.remove('hidden');
+  select.innerHTML = '<option value="">-- Chọn trường --</option>';
+  schoolList.forEach(sch => {
+    const opt = document.createElement('option');
+    opt.value = sch;
+    opt.textContent = sch;
+    select.appendChild(opt);
+  });
+}
+
+function populateClassSelect(selectedSchool) {
+  const select = document.getElementById('classSelect');
+  const pool = selectedSchool
+    ? studentData.filter(s => s.school === selectedSchool)
+    : studentData;
+  classList = [...new Set(pool.map(s => s.class))].sort();
+
+  select.innerHTML = '';
+  if (classList.length === 0) {
+    select.innerHTML = '<option value="">-- Không có lớp nào --</option>';
+    select.disabled = true;
+    return;
+  }
+  select.disabled = false;
+  select.innerHTML = '<option value="">-- Chọn lớp --</option>';
+  classList.forEach(cls => {
+    const opt = document.createElement('option');
+    opt.value = cls;
+    opt.textContent = cls;
+    select.appendChild(opt);
+  });
+}
+
+/* =========================================================
+   ĐĂNG NHẬP
+   ========================================================= */
+function normalizeText(str) {
+  return (str || '')
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd');
+}
+
+function renderStudentOptions(students) {
+  const studentSelect = document.getElementById('studentSelect');
+  const prevValue = studentSelect.value;
+
+  if (students.length === 0) {
+    studentSelect.innerHTML = '<option value="">-- Không tìm thấy học sinh --</option>';
+    studentSelect.disabled = true;
+    return;
+  }
+
+  studentSelect.disabled = false;
+  studentSelect.innerHTML = '<option value="">-- Chọn học sinh --</option>';
+  students.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.name;
+    opt.textContent = s.name;
+    studentSelect.appendChild(opt);
+  });
+
+  if (prevValue && students.some(s => s.name === prevValue)) {
+    studentSelect.value = prevValue;
+  } else if (students.length === 1) {
+    studentSelect.value = students[0].name;
+  }
+}
+
+function getFirstLetterOfGivenName(fullName) {
+  const parts = (fullName || '').trim().split(/\s+/);
+  const lastWord = parts.length > 0 ? parts[parts.length - 1] : '';
+  const normalized = normalizeText(lastWord);
+  return normalized.charAt(0).toUpperCase();
+}
+
+const LETTER_LIST = ['A','B','C','D','E','G','H','I','K','L','M','N','O','P','Q','R','S','T','U','V','X','Y','Z','W'];
+let selectedLetter = '';
+
+const LETTER_COLORS = [
+  '#e63946', '#f3722c', '#f9a825', '#43aa8b', '#2a9d8f',
+  '#118ab2', '#4361ee', '#7209b7', '#b5179e', '#ef476f',
+  '#ff6b6b', '#06a77d', '#3a86ff', '#9d4edd', '#e76f51',
+  '#0077b6', '#d62828', '#2b9348', '#8338ec', '#fb5607',
+  '#ff006e', '#219ebc', '#c9184a', '#588157'
+];
+const LETTER_COLOR_MAP = {};
+LETTER_LIST.forEach((letter, i) => {
+  LETTER_COLOR_MAP[letter] = LETTER_COLORS[i % LETTER_COLORS.length];
+});
+
+function renderLetterFilter() {
+  const box = document.getElementById('letterFilter');
+  const availableLetters = new Set(currentClassStudents.map(s => getFirstLetterOfGivenName(s.name)));
+
+  let html = `<button type="button" class="letter-btn all-btn ${selectedLetter === '' ? 'active' : ''}" data-letter="">Tất cả</button>`;
+  LETTER_LIST.forEach(letter => {
+    const has = availableLetters.has(letter);
+    const colorStyle = has ? ` style="--ltr-color:${LETTER_COLOR_MAP[letter]};"` : '';
+    html += `<button type="button" class="letter-btn ${selectedLetter === letter ? 'active' : ''} ${has ? 'has-student' : 'disabled'}" data-letter="${letter}"${colorStyle}>${letter}</button>`;
+  });
+  box.innerHTML = html;
+
+  box.querySelectorAll('.letter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      selectedLetter = this.getAttribute('data-letter');
+      applyStudentFilter();
+    });
+  });
+}
+
+function applyStudentFilter() {
+  document.getElementById('studentError').textContent = '';
+  document.getElementById('loginError').textContent = '';
+
+  let filtered = currentClassStudents;
+  if (selectedLetter) {
+    filtered = filtered.filter(s => getFirstLetterOfGivenName(s.name) === selectedLetter);
+  }
+  renderStudentOptions(filtered);
+  document.querySelectorAll('#letterFilter .letter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-letter') === selectedLetter);
+  });
+}
+
+document.getElementById('schoolSelect').addEventListener('change', function() {
+  const selectedSchool = this.value;
+  const studentSelect = document.getElementById('studentSelect');
+  document.getElementById('schoolError').textContent = '';
+  document.getElementById('classError').textContent = '';
+  document.getElementById('studentError').textContent = '';
+  document.getElementById('loginError').textContent = '';
+
+  currentClassStudents = [];
+  selectedLetter = '';
+  studentSelect.innerHTML = '<option value="">-- Vui lòng chọn lớp trước --</option>';
+  studentSelect.disabled = true;
+  document.getElementById('letterFilter').innerHTML = '';
+
+  if (!selectedSchool) {
+    document.getElementById('classSelect').innerHTML = '<option value="">-- Vui lòng chọn trường trước --</option>';
+    document.getElementById('classSelect').disabled = true;
+    return;
+  }
+  populateClassSelect(selectedSchool);
+});
+
+document.getElementById('classSelect').addEventListener('change', function() {
+  const selectedClass = this.value;
+  const selectedSchool = document.getElementById('schoolSelect').value;
+  const studentSelect = document.getElementById('studentSelect');
+  document.getElementById('classError').textContent = '';
+  document.getElementById('studentError').textContent = '';
+  document.getElementById('loginError').textContent = '';
+
+  selectedLetter = '';
+
+  if (!selectedClass) {
+    currentClassStudents = [];
+    studentSelect.innerHTML = '<option value="">-- Vui lòng chọn lớp trước --</option>';
+    studentSelect.disabled = true;
+    document.getElementById('letterFilter').innerHTML = '';
+    return;
+  }
+  currentClassStudents = studentData.filter(s => s.class === selectedClass && (!selectedSchool || s.school === selectedSchool));
+  renderLetterFilter();
+  renderStudentOptions(currentClassStudents);
+});
+
+document.getElementById('btnStartQuiz').addEventListener('click', function() {
+  const schoolSelect = document.getElementById('schoolSelect');
+  const classSelect = document.getElementById('classSelect');
+  const studentSelect = document.getElementById('studentSelect');
+  document.getElementById('schoolError').textContent = '';
+  document.getElementById('classError').textContent = '';
+  document.getElementById('studentError').textContent = '';
+  document.getElementById('loginError').textContent = '';
+  const schoolGroupVisible = !document.getElementById('schoolGroup').classList.contains('hidden');
+  const selectedSchool = schoolSelect.value;
+  const selectedClass = classSelect.value;
+  const selectedStudent = studentSelect.value;
+  
+  if (schoolGroupVisible && !selectedSchool) {
+    document.getElementById('schoolError').textContent = 'Vui lòng chọn trường';
+    return;
+  }
+  if (!selectedClass) {
+    document.getElementById('classError').textContent = 'Vui lòng chọn lớp';
+    return;
+  }
+  if (!selectedStudent) {
+    document.getElementById('studentError').textContent = 'Vui lòng chọn học sinh';
+    return;
+  }
+  const valid = studentData.some(s => s.name === selectedStudent && s.class === selectedClass && (!schoolGroupVisible || s.school === selectedSchool));
+  if (!valid) {
+    document.getElementById('loginError').textContent = 'Học sinh không hợp lệ. Vui lòng chọn lại.';
+    return;
+  }
+  
+  state.studentName = selectedStudent;
+  state.studentClass = selectedClass;
+  state.studentSchool = selectedSchool || '';
+  state.isLoggedIn = true;
+  state.hasSubmitted = false;
+
+  document.getElementById('loginModal').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('studentInfo').textContent = `👤 ${selectedStudent} - ${selectedClass}`;
+
+  // Kiểm tra quizData rỗng (vì đã rút gọn)
+  if(!quizData || quizData.length === 0){
+      document.getElementById('questionText').innerHTML = `<h3 style="color:var(--red)">Lỗi: Bạn chưa đưa mảng quizData vào lại file. Vui lòng copy biến quizData từ code gốc và dán vào.</h3>`;
+      return;
+  }
+
+  // [TESTING] Xáo trộn thứ tự xuất hiện các câu hỏi cho mỗi lượt làm bài
+  shuffleQuestionsOrder();
+  initShuffleOrders();
+
+  setTimeout(loadZoomSetting, 50);
+  render();
+  startTimer();
+});
+
+/* =========================================================
+   CÁC HÀM XỬ LÝ QUIZ (GIỮ NGUYÊN HOÀN TOÀN TỪ CODE GỐC)
+   ========================================================= */
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// [TESTING] Xáo trộn ngay trong mảng quizData (mutate in-place) để toàn bộ
+// logic xác định "câu cuối cùng" dựa trên VỊ TRÍ hiển thị (state.current /
+// quizData.length - 1), chứ không phải dựa trên q.id lớn nhất.
+function shuffleQuestionsOrder() {
+  const shuffled = shuffleArray(quizData);
+  quizData.splice(0, quizData.length, ...shuffled);
+}
+
+function initShuffleOrders() {
+  state.shuffleOrders = {};
+  quizData.forEach(q => {
+    if (q.type === 'single' || q.type === 'multiple') {
+      state.shuffleOrders[q.id] = shuffleArray(q.options.map((_, i) => i));
+    } else if (q.type === 'tf') {
+      state.shuffleOrders[q.id] = shuffleArray([0, 1]);
+    } else if (q.type === 'group_tf') {
+      state.shuffleOrders[q.id] = q.items.map((_, i) => i);
+    } else if (q.type === 'match') {
+      state.shuffleOrders[q.id] = {
+        left: shuffleArray(q.left.map((_, i) => i)),
+        right: shuffleArray(q.right.map((_, i) => i))
+      };
+    }
+  });
+}
+initShuffleOrders();
+
+function fmtTime(sec) {
+  sec = Math.max(0, sec);
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  const pad = n => n.toString().padStart(2, '0');
+  return pad(h) + ":" + pad(m) + ":" + pad(s);
+}
+
+function startTimer() {
+  clearInterval(state.timerHandle);
+  state.timerHandle = setInterval(() => {
+    if (state.finished) { clearInterval(state.timerHandle); return; }
+    state.timeLeft--;
+    updateTimerDisplay();
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerHandle);
+      finishQuiz();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('qTimer');
+  if (el) {
+    el.textContent = "Thời gian còn: " + fmtTime(state.timeLeft);
+    el.classList.toggle('warn', state.timeLeft <= 60);
+  }
+}
+
+function currentQuestion() { return quizData[state.current]; }
+
+function isAnswered(q) {
+  const a = state.answers[q.id];
+  if (a === undefined || a === null) return false;
+  if (q.type === 'single' || q.type === 'tf') return true;
+  if (q.type === 'multiple') return Array.isArray(a) && a.length > 0;
+  if (q.type === 'group_tf') return Object.keys(a).length === q.items.length;
+  if (q.type === 'match') return Object.keys(a).length === q.left.length;
+  if (q.type === 'position') return true;
+  return false;
+}
+
+function render() {
+  const q = currentQuestion();
+  const qCountEl = document.getElementById('qCount');
+  const progressFill = document.getElementById('progressFill');
+  const btnBack = document.getElementById('btnBack');
+  const btnNext = document.getElementById('btnNext');
+
+  if (qCountEl) qCountEl.textContent = `Câu hỏi: ${state.current + 1}/${quizData.length}`;
+  if (progressFill) {
+    const pct = ((state.current + 1) / quizData.length) * 100;
+    progressFill.style.width = pct + "%";
+  }
+  updateTimerDisplay();
+  renderDots(q);
+  renderQuestionText(q);
+  renderContent(q);
+  if (btnBack) btnBack.disabled = state.current === 0;
+  if (btnNext) btnNext.textContent = (state.current === quizData.length - 1) ? "Hoàn thành" : "Tiếp theo";
+}
+
+function renderDots(q) {
+  const row = document.getElementById('dotsRow');
+  if (!row) return;
+  let count = 0;
+  if (q.type === 'match') count = q.left.length;
+  else if (q.type === 'group_tf') count = q.items.length;
+  else if (q.type === 'position') count = 1;
+  else { row.classList.add('hidden'); row.innerHTML = ''; return; }
+  row.classList.remove('hidden');
+  row.innerHTML = '';
+  const answeredCount = subAnswerCount(q);
+  for (let i = 0; i < count; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < answeredCount ? ' filled' : '');
+    row.appendChild(d);
+  }
+}
+
+function subAnswerCount(q) {
+  const a = state.answers[q.id];
+  if (!a) return 0;
+  if (q.type === 'match' || q.type === 'group_tf') return Object.keys(a).length;
+  if (q.type === 'position') return 1;
+  return 0;
+}
+
+function renderQuestionText(q) {
+  const box = document.getElementById('questionText');
+  if (!box) return;
+  let html = `<div class="question-text">${q.question}</div>`;
+  if (q.note) html += `<div class="question-note">${q.note}</div>`;
+  box.innerHTML = html;
+}
+
+function getAnswerFeedback(q){
+  // [TESTING] Không thông báo kết quả đúng/sai của từng câu hỏi.
+  return '';
+}
+
+function renderContent(q) {
+  const wrap = document.getElementById('contentWrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  switch (q.type) {
+    case 'single': renderSingle(q, wrap); break;
+    case 'multiple': renderMultiple(q, wrap); break;
+    case 'tf': renderTF(q, wrap); break;
+    case 'group_tf': renderGroupTF(q, wrap); break;
+    case 'match': renderMatch(q, wrap); break;
+    case 'position': renderPosition(q, wrap); break;
+  }
+  const feedback = getAnswerFeedback(q);
+  if (feedback) wrap.insertAdjacentHTML('beforeend', feedback);
+}
+
+function mockupHTML(name, width, height) {
+  let src = IMAGES[name];
+  if (!src) src = name;
+  const parts = [];
+  if (width) parts.push(`width:${width}px`);
+  if (height) parts.push(`height:${height}px`);
+  const wrapStyle = parts.length ? ` style="${parts.join(';')}"` : '';
+  return `<div class="mockup-img-wrap"${wrapStyle}>${imgWithFallback(src, name, width, height)}</div>`;
+}
+
+function renderSingle(q, wrap) {
+  const order = state.shuffleOrders[q.id] || q.options.map((_, i) => i);
+  const isImageOpts = q.options.some(o => typeof o === 'string' && o.startsWith('img:'));
+  let inner = '';
+  if (isImageOpts) {
+    inner += `<div class="option-grid-image">`;
+    order.forEach(i => {
+      const opt = q.options[i];
+      const url = opt.replace('img:', '');
+      const sel = state.answers[q.id] === i;
+      const cardStyle = q.imageWidth ? ` style="width:${q.imageWidth}px"` : '';
+      inner += `<div class="option-image-card ${sel ? 'selected' : ''}" data-i="${i}"${cardStyle}>
+        ${imgWithFallback(url, 'option ' + (i + 1), q.imageWidth, q.imageHeight)}<input type="radio" name="single${q.id}" ${sel ? 'checked' : ''} style="pointer-events:none;"></div>`;
+    });
+    inner += `</div>`;
+  } else {
+    inner += `<div class="option-list">`;
+    order.forEach(i => {
+      const opt = q.options[i];
+      const sel = state.answers[q.id] === i;
+      inner += `<label class="option-row ${sel ? 'selected' : ''}" data-i="${i}">
+        <input type="radio" name="single${q.id}" ${sel ? 'checked' : ''}>
+        <span class="opt-label">${opt}</span></label>`;
+    });
+    inner += `</div>`;
+  }
+  let mockup = q.mockup ? `<div class="single-media-box">${mockupHTML(q.mockup, q.imageWidth, q.imageHeight)}</div>` : '';
+  wrap.innerHTML = mockup ? `<div class="single-with-media">${mockup}<div>${inner}</div></div>` : inner;
+
+  wrap.querySelectorAll('[data-i]').forEach(el => {
+    el.addEventListener('click', () => {
+      state.answers[q.id] = parseInt(el.getAttribute('data-i'));
+      state.feedbackShown = false;
+      renderContent(q);
+      renderDots(q);
+    });
+  });
+}
+
+function renderMultiple(q, wrap) {
+  const order = state.shuffleOrders[q.id] || q.options.map((_, i) => i);
+  let cur = state.answers[q.id] || [];
+  let inner = `<div class="option-list">`;
+  order.forEach(i => {
+    const opt = q.options[i];
+    const sel = cur.includes(i);
+    inner += `<label class="option-row ${sel ? 'selected' : ''}" data-i="${i}">
+      <input type="checkbox" ${sel ? 'checked' : ''}>
+      <span class="opt-label">${opt}</span></label>`;
+  });
+  inner += `</div>`;
+  wrap.innerHTML = inner;
+  wrap.querySelectorAll('[data-i]').forEach(el => {
+    el.addEventListener('click', () => {
+      const i = parseInt(el.getAttribute('data-i'));
+      let arr = state.answers[q.id] ? state.answers[q.id].slice() : [];
+      const idx = arr.indexOf(i);
+      if (idx >= 0) arr.splice(idx, 1); else arr.push(i);
+      state.answers[q.id] = arr;
+      state.feedbackShown = false;
+      renderContent(q);
+    });
+  });
+}
+
+function renderTF(q, wrap) {
+  const cur = state.answers[q.id];
+  const order = state.shuffleOrders[q.id] || [0, 1];
+  const btns = [
+    `<div class="tf-btn ${cur === true ? 'selected' : ''}" data-v="true">Đúng</div>`,
+    `<div class="tf-btn ${cur === false ? 'selected' : ''}" data-v="false">Sai</div>`
+  ];
+  wrap.innerHTML = `<div class="tf-buttons">${order.map(i => btns[i]).join('')}</div>`;
+  wrap.querySelectorAll('[data-v]').forEach(el => {
+    el.addEventListener('click', () => {
+      state.answers[q.id] = el.getAttribute('data-v') === 'true';
+      state.feedbackShown = false;
+      renderContent(q);
+    });
+  });
+}
+
+function renderGroupTF(q, wrap) {
+  const order = state.shuffleOrders[q.id] || q.items.map((_, i) => i);
+  let cur = state.answers[q.id] || {};
+  
+  // === THÊM PHẦN HIỂN THỊ ẢNH ===
+  let imageHtml = '';
+  if (q.image) {
+    // Nếu có image, hiển thị ảnh
+    imageHtml = `<div class="mockup-img-wrap" style="margin-bottom:16px; max-width:100%;">
+      ${imgWithFallback(q.image, 'Hình ảnh minh họa', q.imageWidth || 600, q.imageHeight || 400)}
+    </div>`;
+  }
+  
+  let html = imageHtml; // Thêm ảnh vào đầu
+  
+  html += `<table class="group-tf-table"><thead><tr><th style="text-align:left;">&nbsp;</th>
+    <th>${q.labels[0]}</th><th>${q.labels[1]}</th></tr></thead><tbody>`;
+  order.forEach(i => {
+    const item = q.items[i];
+    const val = cur[i];
+    html += `<tr>
+      <td class="statement">${item.text}</td>
+      <td><div class="gtf-choice"><span class="gtf-radio ${val === true ? 'checked' : ''}" data-i="${i}" data-v="true"></span></div></td>
+      <td><div class="gtf-choice"><span class="gtf-radio ${val === false ? 'checked' : ''}" data-i="${i}" data-v="false"></span></div></td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+  
+  // Giữ nguyên phần sự kiện click
+  wrap.querySelectorAll('[data-i]').forEach(el => {
+    el.addEventListener('click', () => {
+      const i = parseInt(el.getAttribute('data-i'));
+      const v = el.getAttribute('data-v') === 'true';
+      let cur = state.answers[q.id] ? Object.assign({}, state.answers[q.id]) : {};
+      cur[i] = v;
+      state.answers[q.id] = cur;
+      state.feedbackShown = false;
+      renderContent(q);
+      renderDots(q);
+    });
+  });
+}
+
+let dragLeftIndex = null;
+let selectedLeftIndex = null;
+
+function renderMatch(q, wrap) {
+  const orders = state.shuffleOrders[q.id] || { left: q.left.map((_, i) => i), right: q.right.map((_, i) => i) };
+  const leftOrder = orders.left, rightOrder = orders.right;
+  let cur = state.answers[q.id] || {};
+  selectedLeftIndex = (selectedLeftIndex !== null && cur[selectedLeftIndex] === undefined) ? selectedLeftIndex : null;
+
+  let html = `<div class="match-wrap">
+    <div class="match-col left-col">
+      <h3>Định nghĩa</h3>
+      <div class="left-items">`;
+  leftOrder.forEach(li => {
+    const txt = q.left[li];
+    const used = cur[li] !== undefined;
+    const sel = selectedLeftIndex === li;
+    html += `<div class="left-item ${used ? 'used' : ''} ${sel ? 'selected' : ''}" draggable="${!used}" data-li="${li}">${txt}</div>`;
+  });
+  html += `</div></div>
+    <div class="match-col right-col">
+      <h3>${q.left.length && q.right.some(r => r.capacity > 1) ? 'Thể loại' : 'Thuật ngữ'}</h3>`;
+
+  const oneToOne = q.right.every(r => r.capacity === 1);
+  if (oneToOne) {
+    rightOrder.forEach(ri => {
+      const r = q.right[ri];
+      const filledLeft = Object.keys(cur).find(li => cur[li] === ri);
+      const text = filledLeft !== undefined ? q.left[filledLeft] : 'Định nghĩa';
+      html += `<div class="right-group-inline">
+        <div class="right-group-label-inline">${r.label}</div>
+        <div class="drop-slot ${filledLeft !== undefined ? 'filled' : ''}" data-ri="${ri}">${text}</div>
+      </div>`;
+    });
+  } else {
+    html += `<div class="right-groups-row">`;
+    rightOrder.forEach(ri => {
+      const r = q.right[ri];
+      html += `<div class="right-group"><div class="right-group-label-col">${r.label}</div>`;
+      for (let slot = 0; slot < r.capacity; slot++) {
+        const filledLeft = Object.keys(cur).filter(li => cur[li] === ri)[slot];
+        const text = filledLeft !== undefined ? q.left[filledLeft] : 'Định nghĩa';
+        html += `<div class="drop-slot ${filledLeft !== undefined ? 'filled' : ''}" data-ri="${ri}" data-slot="${slot}" data-filledli="${filledLeft !== undefined ? filledLeft : ''}">${text}</div>`;
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+  html += `</div></div>`;
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll('.left-item').forEach(el => {
+    const li = parseInt(el.getAttribute('data-li'));
+    if (el.classList.contains('used')) return;
+    el.addEventListener('click', () => {
+      selectedLeftIndex = (selectedLeftIndex === li) ? null : li;
+      renderContent(q);
+    });
+    el.addEventListener('dragstart', (e) => {
+      dragLeftIndex = li;
+      el.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', String(li));
+    });
+    el.addEventListener('dragend', () => { el.classList.remove('dragging'); dragLeftIndex = null; });
+  });
+
+  wrap.querySelectorAll('.drop-slot').forEach(el => {
+    const ri = parseInt(el.getAttribute('data-ri'));
+    el.addEventListener('dragover', (e) => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', (e) => {
+      e.preventDefault(); el.classList.remove('drag-over');
+      const li = dragLeftIndex !== null ? dragLeftIndex : parseInt(e.dataTransfer.getData('text/plain'));
+      placeMatch(q, li, ri, el);
+    });
+    el.addEventListener('click', () => {
+      const filledAttr = el.getAttribute('data-filledli');
+      if (el.classList.contains('filled')) {
+        let cur2 = Object.assign({}, state.answers[q.id] || {});
+        const liToRemove = filledAttr !== '' && filledAttr !== null ? parseInt(filledAttr) :
+          Object.keys(cur2).find(li => cur2[li] === ri);
+        if (liToRemove !== undefined) delete cur2[liToRemove];
+        state.answers[q.id] = cur2;
+        state.feedbackShown = false;
+        renderContent(q); renderDots(q);
+        return;
+      }
+      if (selectedLeftIndex !== null) {
+        placeMatch(q, selectedLeftIndex, ri, el);
+        selectedLeftIndex = null;
+      }
+    });
+  });
+}
+
+function placeMatch(q, li, ri, el) {
+  if (li === null || li === undefined || isNaN(li)) return;
+  let cur = Object.assign({}, state.answers[q.id] || {});
+  const capacity = q.right[ri].capacity;
+  const usedInRi = Object.keys(cur).filter(k => cur[k] === ri).length;
+  if (usedInRi >= capacity) return;
+  cur[li] = ri;
+  state.answers[q.id] = cur;
+  state.feedbackShown = false;
+  renderContent(q);
+  renderDots(q);
+}
+
+function renderPosition(q, wrap) {
+  const inner = q.mockup ? mockupHTML(q.mockup, q.imageWidth, q.imageHeight) : (q.image ? imgWithFallback(q.image, 'position-image-' + q.id, q.imageWidth, q.imageHeight) : '');
+  wrap.innerHTML = `<div class="position-wrap"><div class="position-target-area" id="posArea">${inner}</div></div>`;
+  const area = document.getElementById('posArea');
+  if (!area) return;
+
+  const pos = state.clickPos[q.id];
+  if (pos) {
+    const marker = document.createElement('div');
+    marker.className = 'click-marker';
+    marker.style.left = pos.x + '%';
+    marker.style.top = pos.y + '%';
+    area.appendChild(marker);
+  }
+
+  area.addEventListener('click', (e) => {
+    const rect = area.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    state.clickPos[q.id] = { x, y };
+    state.answers[q.id] = { x, y };
+    state.feedbackShown = false;
+    renderContent(q);
+    renderDots(q);
+  });
+}
+
+function isPointInTarget(pt, target) {
+  return pt.x >= target.x && pt.x <= target.x + target.w &&
+         pt.y >= target.y && pt.y <= target.y + target.h;
+}
+
+function evaluateQuestion(q) {
+  const a = state.answers[q.id];
+  if (q.type === 'single' || q.type === 'tf') {
+    const correct = (q.type === 'single') ? (a === q.answer) : (a === q.answer);
+    return { correctUnits: correct ? 1 : 0, totalUnits: 1, fullyCorrect: correct };
+  }
+  if (q.type === 'multiple') {
+    if (!Array.isArray(a)) return { correctUnits: 0, totalUnits: 1, fullyCorrect: false };
+    const setA = new Set(a), setB = new Set(q.answers);
+    const equal = setA.size === setB.size && [...setA].every(v => setB.has(v));
+    return { correctUnits: equal ? 1 : 0, totalUnits: 1, fullyCorrect: equal };
+  }
+  if (q.type === 'group_tf') {
+    let correctUnits = 0;
+    q.items.forEach((it, i) => { if (a && a[i] === it.isTrue) correctUnits++; });
+    return { correctUnits, totalUnits: q.items.length, fullyCorrect: correctUnits === q.items.length };
+  }
+  if (q.type === 'match') {
+    let correctUnits = 0;
+    q.left.forEach((_, li) => { if (a && a[li] === q.correctMap[li]) correctUnits++; });
+    return { correctUnits, totalUnits: q.left.length, fullyCorrect: correctUnits === q.left.length };
+  }
+  if (q.type === 'position') {
+    const correct = a ? isPointInTarget(a, q.target) : false;
+    return { correctUnits: correct ? 1 : 0, totalUnits: 1, fullyCorrect: correct };
+  }
+  return { correctUnits: 0, totalUnits: 1, fullyCorrect: false }; 
+}
+
+function computeScore() {
+  let correctUnits = 0, totalUnits = 0, wrongQuestions = [];
+  quizData.forEach(q => {
+    const r = evaluateQuestion(q);
+    totalUnits += 1;
+    if (r.fullyCorrect) correctUnits += 1;
+    if (!r.fullyCorrect) wrongQuestions.push(q);
+  });
+  return { correctUnits, totalUnits, wrongQuestions };
+}
+
+document.getElementById('btnNext').addEventListener('click', () => {
+  // [TESTING] Không còn bước hiện thông báo đúng/sai — bấm là chuyển câu
+  // ngay (hoặc mở cảnh báo nộp bài nếu đang ở câu cuối cùng).
+  if (state.current === quizData.length - 1) {
+    confirmAndFinish();
+  } else {
+    state.current++;
+    state.feedbackShown = false;
+    render();
+  }
+});
+document.getElementById('btnBack').addEventListener('click', () => {
+  if (state.current > 0) { state.current--; state.feedbackShown = false; render(); }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  const loginModalOpen = !document.getElementById('loginModal').classList.contains('hidden');
+  const summaryOpen = !document.getElementById('summaryModal').classList.contains('hidden');
+  const reviewOpen = !document.getElementById('reviewModal').classList.contains('hidden');
+  const quizVisible = !document.getElementById('quiz-screen').classList.contains('hidden');
+  if (loginModalOpen || summaryOpen || reviewOpen || !quizVisible || state.finished) return;
+  e.preventDefault();
+  document.getElementById('btnNext').click();
+});
+
+document.getElementById('btnSummary').addEventListener('click', openSummary);
+document.getElementById('btnCloseSummary').addEventListener('click', () => {
+  document.getElementById('summaryModal').classList.add('hidden');
+});
+document.getElementById('btnSubmitFromSummary').addEventListener('click', () => {
+  document.getElementById('summaryModal').classList.add('hidden');
+  confirmAndFinish();
+});
+
+function openSummary() {
+  const grid = document.getElementById('summaryGrid');
+  grid.innerHTML = '';
+  quizData.forEach((q, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'summary-cell' + (isAnswered(q) ? ' answered' : '') + (i === state.current ? ' current' : '');
+    cell.textContent = i + 1;
+    cell.addEventListener('click', () => {
+      state.current = i;
+      state.feedbackShown = false;
+      document.getElementById('summaryModal').classList.add('hidden');
+      render();
+    });
+    grid.appendChild(cell);
+  });
+  document.getElementById('summaryModal').classList.remove('hidden');
+}
+
+function confirmAndFinish() {
+  const unansweredCount = quizData.filter(q => !isAnswered(q)).length;
+
+  if (unansweredCount === 0) {
+    finishQuiz();
+    return;
+  }
+
+  document.getElementById('confirmSubmitText').textContent =
+    `Bạn còn ${unansweredCount} câu chưa trả lời trong tổng số ${quizData.length} câu.`;
+  document.getElementById('confirmSubmitModal').classList.remove('hidden');
+}
+
+document.getElementById('btnCancelSubmit').addEventListener('click', () => {
+  document.getElementById('confirmSubmitModal').classList.add('hidden');
+});
+document.getElementById('btnConfirmSubmit').addEventListener('click', () => {
+  document.getElementById('confirmSubmitModal').classList.add('hidden');
+  finishQuiz();
+});
+
+function finishQuiz() {
+  state.finished = true;
+  clearInterval(state.timerHandle);
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+  renderResult();
+
+  // [TESTING] Đạt từ 70% trở lên -> tự động nộp bài đến giáo viên.
+  const { correctUnits, totalUnits } = computeScore();
+  const pct = totalUnits > 0 ? (correctUnits / totalUnits) * 100 : 0;
+  if (pct >= 70) {
+    sendQuizResult();
+  }
+}
+
+function resetSendScoreUI() {
+  const btn = document.getElementById('btnSendScore');
+  const statusEl = document.getElementById('sendStatus');
+  if (statusEl) statusEl.textContent = '';
+  if (btn) {
+    btn.classList.toggle('hidden', !SERVER_CONFIG.url);
+    btn.disabled = false;
+    btn.textContent = '📤 Nộp bài';
+  }
+}
+
+function splitFullName(fullName) {
+  const parts = (fullName || '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return { hoTenDem: '', ten: '' };
+  const ten = parts.pop();
+  const hoTenDem = parts.join(' ');
+  return { hoTenDem, ten };
+}
+
+function formatDateVN(d) {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function formatTimeVN(d) {
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  return `${hh}:${mi}`;
+}
+
+function formatDuration(totalSeconds) {
+  const s = Math.max(0, Math.round(totalSeconds));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  let out = '';
+  if (h > 0) out += h + 'h';
+  if (h > 0 || m > 0) out += String(m).padStart(h > 0 ? 2 : 1, '0') + 'p';
+  out += sec + 's';
+  return out;
+}
+
+function sendQuizResult() {
+  const statusEl = document.getElementById('sendStatus');
+  const btn = document.getElementById('btnSendScore');
+  if (!SERVER_CONFIG.url) {
+    if (statusEl) {
+      statusEl.textContent = '⚠ Chưa cấu hình URL gửi dữ liệu.';
+      statusEl.style.color = 'var(--red)';
+    }
+    return;
+  }
+  if (state.hasSubmitted) {
+    if (statusEl) {
+      statusEl.textContent = '✅ Bài làm đã được nộp trước đó.';
+      statusEl.style.color = 'var(--green)';
+    }
+    return;
+  }
+
+  const { correctUnits, totalUnits } = computeScore();
+  const pct = totalUnits > 0 ? Math.round((correctUnits / totalUnits) * 100) : 0;
+  const fileName = SERVER_CONFIG.fileName || (location.pathname.split('/').pop() || 'luyen_tap.html');
+
+  const questionDetails = quizData.map((q, idx) => {
+    const result = evaluateQuestion(q);
+    return {
+      questionNumber: idx + 1,
+      questionId: q.id,
+      questionType: q.type,
+      questionText: q.question.substring(0, 50) + (q.question.length > 50 ? '...' : ''),
+      isCorrect: result.fullyCorrect,
+      score: result.correctUnits + '/' + result.totalUnits
+    };
+  });
+
+  const now = new Date();
+  const { hoTenDem, ten } = splitFullName(state.studentName);
+  const durationSeconds = TOTAL_TIME - state.timeLeft;
+
+  const payload = {
+    school: state.studentSchool || SERVER_CONFIG.schoolName || '',
+    hoTenDem: hoTenDem,
+    ten: ten,
+    studentClass: state.studentClass || '(Chưa chọn lớp)',
+    fileName: fileName,
+    score: `${correctUnits}`,
+    dateStr: formatDateVN(now),
+    timeStr: formatTimeVN(now),
+    durationStr: formatDuration(durationSeconds),
+    studentName: state.studentName || '(Chưa nhập tên)',
+    percentage: `${pct}%`,
+    totalCorrect: correctUnits,
+    totalQuestions: totalUnits,
+    timestamp: now.toISOString(),
+    timeSpent: durationSeconds,
+    questionDetails: questionDetails,
+    rawAnswers: state.answers
+  };
+
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Đang gửi...'; }
+  if (statusEl) {
+    statusEl.textContent = '⏳ Đang nộp bài tới giáo viên...';
+    statusEl.style.color = '#666';
+  }
+
+  fetch(SERVER_CONFIG.url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json;charset=utf-8' },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    state.hasSubmitted = true;
+    if (statusEl) {
+      statusEl.textContent = '✅ Nộp bài thành công! Giáo viên đã nhận được kết quả.';
+      statusEl.style.color = 'var(--green)';
+    }
+    if (btn) { btn.disabled = false; btn.textContent = '✅ Đã nộp'; btn.style.opacity = '0.7'; }
+  })
+  .catch(err => {
+    if (statusEl) {
+      statusEl.textContent = '⚠ Nộp bài thất bại, vui lòng thử lại.';
+      statusEl.style.color = 'var(--red)';
+    }
+    if (btn) { btn.disabled = false; btn.textContent = '📤 Nộp lại bài'; }
+  });
+}
+document.getElementById('btnSendScore').addEventListener('click', sendQuizResult);
+
+function renderResult() {
+  const { correctUnits, totalUnits, wrongQuestions } = computeScore();
+  const pct = totalUnits > 0 ? Math.round((correctUnits / totalUnits) * 100) : 0;
+  const perfect = correctUnits === totalUnits;
+
+  resetSendScoreUI();
+
+  document.getElementById('trophyBox').innerHTML = perfect ? `<div class="trophy">🏆</div>` : '';
+  document.getElementById('scoreBig').textContent = `${correctUnits}/${totalUnits} điểm (${pct}%)`;
+  document.getElementById('scoreSub').textContent = perfect
+    ? 'Xuất sắc! Bạn đã đạt điểm tuyệt đối.'
+    : `Bạn đã trả lời đúng ${correctUnits} trên tổng số ${totalUnits} phần.`;
+
+  const wrongList = document.getElementById('wrongList');
+  if (wrongQuestions.length === 0) {
+    wrongList.innerHTML = '';
+  } else {
+    let html = `<h3 style="margin-bottom:12px;">📝 Xem lại các câu chưa chính xác</h3>`;
+    wrongQuestions.forEach(q => {
+      const idx = quizData.findIndex(x => x.id === q.id);
+      html += `<div class="wrong-item">
+        <div class="wq-text">Câu ${idx + 1}: ${q.question}</div>
+        <button data-id="${q.id}">🔍 Xem lại</button>
+      </div>`;
+    });
+    wrongList.innerHTML = html;
+    wrongList.querySelectorAll('button[data-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const q = quizData.find(x => x.id === parseInt(btn.getAttribute('data-id')));
+        openReview(q);
+      });
+    });
+  }
+}
+
+document.getElementById('btnRetry').addEventListener('click', () => {
+  const prevName = state.studentName;
+  const prevClass = state.studentClass;
+  const prevSchool = state.studentSchool;
+  state = {
+    current: 0,
+    answers: {},
+    timeLeft: TOTAL_TIME,
+    timerHandle: null,
+    finished: false,
+    clickPos: {},
+    shuffleOrders: {},
+    studentName: prevName,
+    studentClass: prevClass,
+    studentSchool: prevSchool,
+    isLoggedIn: true,
+    hasSubmitted: false,
+    feedbackShown: false
+  };
+  shuffleQuestionsOrder();
+  initShuffleOrders();
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('studentInfo').textContent = `👤 ${prevName} - ${prevClass}`;
+  render();
+  startTimer();
+});
+
+function optionLabelText(q, i) {
+  const o = q.options[i];
+  return o && o.startsWith('img:') ? '(hình ảnh đáp án ' + (i + 1) + ')' : o;
+}
+
+function openReview(q) {
+  const box = document.getElementById('reviewBox');
+  const a = state.answers[q.id];
+  let html = `<h2>📖 Xem lại câu hỏi</h2><div class="question-text" style="margin-bottom:10px;">${q.question}</div>`;
+
+  if (q.type === 'single') {
+    html += `<div class="review-answer-line wrong">❌ Bạn chọn: ${a !== undefined ? optionLabelText(q, a) : '(chưa trả lời)'}</div>`;
+    html += `<div class="review-answer-line correct">✅ Đáp án đúng: ${optionLabelText(q, q.answer)}</div>`;
+  } else if (q.type === 'tf') {
+    html += `<div class="review-answer-line wrong">❌ Bạn chọn: ${a === true ? 'Đúng' : a === false ? 'Sai' : '(chưa trả lời)'}</div>`;
+    html += `<div class="review-answer-line correct">✅ Đáp án đúng: ${q.answer ? 'Đúng' : 'Sai'}</div>`;
+  } else if (q.type === 'multiple') {
+    const yourTxt = Array.isArray(a) ? a.map(i => q.options[i]).join('; ') : '(chưa trả lời)';
+    const correctTxt = q.answers.map(i => q.options[i]).join('; ');
+    html += `<div class="review-answer-line wrong">❌ Bạn chọn: ${yourTxt}</div>`;
+    html += `<div class="review-answer-line correct">✅ Đáp án đúng: ${correctTxt}</div>`;
+  } else if (q.type === 'group_tf') {
+    q.items.forEach((it, i) => {
+      const yourV = a ? a[i] : undefined;
+      const ok = yourV === it.isTrue;
+      html += `<div class="review-answer-line ${ok ? 'correct' : 'wrong'}">${it.text} — Bạn: ${yourV === undefined ? '(chưa)' : (yourV ? 'Đúng' : 'Sai')} | Đúng: ${it.isTrue ? 'Đúng' : 'Sai'}</div>`;
+    });
+  } else if (q.type === 'match') {
+    q.left.forEach((txt, li) => {
+      const yourRi = a ? a[li] : undefined;
+      const correctRi = q.correctMap[li];
+      const ok = yourRi === correctRi;
+      html += `<div class="review-answer-line ${ok ? 'correct' : 'wrong'}">${txt} → Bạn: ${yourRi !== undefined ? q.right[yourRi].label : '(chưa)'} | Đúng: ${q.right[correctRi].label}</div>`;
+    });
+  } else if (q.type === 'position') {
+    const ok = a ? isPointInTarget(a, q.target) : false;
+    html += `<div class="review-answer-line ${ok ? 'correct' : 'wrong'}">${ok ? '✅ Bạn đã chọn đúng vị trí.' : '❌ Bạn đã chọn sai vị trí.'}</div>`;
+    html += `<div style="position:relative;display:inline-block;margin-top:10px;">${q.mockup ? mockupHTML(q.mockup, q.imageWidth, q.imageHeight) : (q.image ? imgWithFallback(q.image, 'position-image-' + q.id, q.imageWidth, q.imageHeight) : '')}
+      <div class="target-reveal" style="left:${q.target.x}%;top:${q.target.y}%;width:${q.target.w}%;height:${q.target.h}%;"></div>
+      ${a ? `<div class="click-marker ${ok ? 'correct' : 'wrong'}" style="left:${a.x}%;top:${a.y}%;position:absolute;"></div>` : ''}
+    </div>`;
+  }
+
+  html += `<div class="modal-actions"><button class="btn btn-primary" id="btnCloseReview">Đóng</button></div>`;
+  box.innerHTML = html;
+  document.getElementById('btnCloseReview').addEventListener('click', () => {
+    document.getElementById('reviewModal').classList.add('hidden');
+  });
+  document.getElementById('reviewModal').classList.remove('hidden');
+}
+
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+}
+function enterFullscreen() {
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+  if (req && !isFullscreen()) req.call(el).catch(() => {});
+}
+function exitFullscreen() {
+  const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+  if (exit && isFullscreen()) exit.call(document);
+}
+function toggleFullscreen() {
+  if (isFullscreen()) exitFullscreen(); else enterFullscreen();
+}
+function updateFullscreenBtn() {
+  const btn = document.getElementById('btnFullscreen');
+  if (btn) btn.textContent = isFullscreen() ? '⤦' : '⛶';
+}
+
+document.getElementById('btnFullscreen').addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', updateFullscreenBtn);
+document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);
+
+document.getElementById('btnZoomIn').addEventListener('click', zoomIn);
+document.getElementById('btnZoomOut').addEventListener('click', zoomOut);
+
+loadStudentData();
+</script>
+</body>
+</html>

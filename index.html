@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thế Giới Tin Học IC3 Spark - Trang Chủ Động</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #3182CE;
+            --text-dark: #2D3748;
+            --card-lv1: #48BB78;
+            --card-lv2: #ED8936;
+            --card-lv3: #9F7AEA;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ==================== HIỆU ỨNG NỀN PASTEL CHUYỂN MÀU ĐỘNG ==================== */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(-45deg, #a1c4fd, #c2e9fb, #fbc2eb, #e6dee9);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ==================== ĐÁM MÂY BỒNG BỀNH (DÙNG CHUNG CHO CẢ TRANG) ==================== */
+        .cloud-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .fluffy-cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            animation: floatClouds linear infinite;
+        }
+
+        .fluffy-cloud::before, .fluffy-cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+
+        /* Cấu hình hình dáng đám mây */
+        .c1 { width: 160px; height: 50px; top: 15%; left: -200px; animation-duration: 35s; }
+        .c1::before { width: 70px; height: 70px; top: -30px; left: 20px; }
+        .c1::after { width: 90px; height: 90px; top: -45px; right: 25px; }
+
+        .c2 { width: 120px; height: 40px; top: 40%; left: -150px; animation-duration: 25s; animation-delay: 5s; transform: scale(0.8); opacity: 0.7;}
+        .c2::before { width: 50px; height: 50px; top: -25px; left: 15px; }
+        .c2::after { width: 65px; height: 65px; top: -35px; right: 15px; }
+
+        .c3 { width: 200px; height: 60px; top: 65%; left: -250px; animation-duration: 45s; animation-delay: 2s; }
+        .c3::before { width: 80px; height: 80px; top: -40px; left: 30px; }
+        .c3::after { width: 110px; height: 110px; top: -55px; right: 30px; }
+
+        .c4 { width: 140px; height: 45px; top: 85%; left: -180px; animation-duration: 30s; animation-delay: 12s; transform: scale(0.9); }
+        .c4::before { width: 60px; height: 60px; top: -30px; left: 20px; }
+        .c4::after { width: 80px; height: 80px; top: -40px; right: 20px; }
+
+        @keyframes floatClouds {
+            from { transform: translateX(-20vw); }
+            to { transform: translateX(120vw); }
+        }
+
+        /* ==================== 0. MÀN HÌNH NHẬP MẬT KHẨU (HIỆU ỨNG KÍNH MỜ) ==================== */
+        #lock-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .lock-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 35px;
+            padding: 45px 35px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            border: 4px solid #fff;
+            position: relative;
+            animation: popInBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+        }
+
+        @keyframes popInBounce {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .lock-icon-wrap {
+            width: 100px; height: 100px;
+            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border: 4px solid #fff;
+            box-shadow: 0 10px 20px rgba(161, 196, 253, 0.5);
+            animation: bounceLock 2s infinite ease-in-out;
+        }
+
+        @keyframes bounceLock {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .lock-title {
+            font-family: 'Baloo 2', cursive;
+            font-size: 2.2rem;
+            color: #4A5568;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 0px #fff;
+        }
+
+        .lock-desc {
+            color: #4A5568;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        .input-group { position: relative; margin-bottom: 20px; }
+
+        .lock-input {
+            width: 100%;
+            padding: 18px 20px;
+            font-size: 1.8rem;
+            font-family: 'Baloo 2', cursive;
+            text-align: center;
+            border: 4px solid transparent;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+            outline: none;
+            color: #2B6CB0;
+            letter-spacing: 12px;
+            transition: all 0.3s;
+        }
+
+        .lock-input:focus {
+            border-color: #a1c4fd;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05), 0 0 0 6px rgba(161, 196, 253, 0.3);
+            transform: scale(1.02);
+        }
+
+        .btn-unlock {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #fbc2eb, #a18cd1);
+            color: #FFFFFF;
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.4rem;
+            font-weight: 800;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #a18cd1, 0 15px 20px rgba(161, 140, 209, 0.4);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-unlock:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 11px 0 #a18cd1, 0 18px 25px rgba(161, 140, 209, 0.5);
+            filter: brightness(1.05);
+        }
+
+        .btn-unlock:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #a18cd1;
+        }
+
+        .error-message {
+            color: #E53E3E;
+            font-weight: 800;
+            margin-top: 15px;
+            font-size: 1.05rem;
+            display: none;
+            background: rgba(253, 232, 232, 0.9);
+            padding: 10px;
+            border-radius: 12px;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        /* Ẩn nội dung chính ban đầu */
+        #main-content-wrapper { display: none; }
+
+        /* ==================== ĐÃ THÊM RẤT NHIỀU ICON VÀO ĐÂY ==================== */
+        .lock-bg-icons {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; overflow: hidden;
+        }
+        .lock-bg-icon {
+            position: absolute; font-size: 2.5rem; opacity: 0.6;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            animation: bgIconFloat 4s infinite ease-in-out;
+            pointer-events: none; text-decoration: none;
+        }
+        a.lock-bg-icon { pointer-events: auto; cursor: pointer; transition: transform 0.3s; z-index: 5; }
+        a.lock-bg-icon:hover { transform: scale(1.5) rotate(15deg); opacity: 1; }
+
+        /* Vị trí rải rác khắp màn hình */
+        .bi-1 { top: 12%; left: 8%; animation-delay: 0s; }
+        .bi-2 { top: 18%; left: 85%; animation-delay: 0.6s; }
+        .bi-3 { top: 35%; left: 5%; animation-delay: 1.2s; }
+        .bi-4 { top: 45%; left: 88%; animation-delay: 0.3s; }
+        .bi-5 { top: 65%; left: 8%; animation-delay: 1.6s; } /* Liên kết bí mật */
+        .bi-6 { top: 75%; left: 85%; animation-delay: 0.9s; }
+        .bi-7 { top: 88%; left: 15%; animation-delay: 1.4s; }
+        .bi-8 { top: 90%; left: 80%; animation-delay: 0.4s; }
+        
+        /* CÁC ICON MỚI THÊM VÀO KHOẢNG TRỐNG */
+        .bi-9 { top: 8%; left: 35%; animation-delay: 2.1s; font-size: 3rem; opacity: 0.5;} /* Mây */
+        .bi-10 { top: 22%; left: 22%; animation-delay: 1.8s; font-size: 2rem;} /* Sao */
+        .bi-11 { top: 15%; left: 65%; animation-delay: 0.7s; font-size: 3.5rem; opacity: 0.5;} /* Mây */
+        .bi-12 { top: 32%; left: 75%; animation-delay: 3.2s; font-size: 2.2rem;} /* Thú cưng */
+        .bi-13 { top: 55%; left: 15%; animation-delay: 2.5s; font-size: 2.8rem;} /* Thú cưng */
+        .bi-14 { top: 60%; left: 75%; animation-delay: 1.1s; font-size: 3rem; opacity: 0.4;} /* Mây */
+        .bi-15 { top: 82%; left: 35%; animation-delay: 2.9s; font-size: 2rem;} /* Đồ chơi */
+        .bi-16 { top: 85%; left: 60%; animation-delay: 0.5s; font-size: 2.5rem;} /* Đồ chơi */
+        .bi-17 { top: 5%; left: 50%; animation-delay: 3.5s; font-size: 2.2rem;} /* Sao */
+        .bi-18 { top: 50%; left: 4%; animation-delay: 1.9s; font-size: 2rem;} /* Bướm */
+        .bi-19 { top: 28%; left: 92%; animation-delay: 2.4s; font-size: 2.4rem;} /* Cún con */
+        .bi-20 { top: 70%; left: 94%; animation-delay: 3.1s; font-size: 2rem;} /* Kẹo */
+        .bi-21 { top: 95%; left: 48%; animation-delay: 1.5s; font-size: 3.2rem; opacity: 0.5;} /* Mây */
+        .bi-22 { top: 40%; left: 20%; animation-delay: 0.8s; font-size: 2rem;} /* Hành tinh */
+        .bi-23 { top: 12%; left: 50%; animation-delay: 2.7s; font-size: 2.2rem;} /* Cầu vồng nhỏ */
+
+        @keyframes bgIconFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(10deg); }
+        }
+
+        /* ==================== 2. HEADER ĐỘNG ==================== */
+        header {
+            text-align: center;
+            padding: 50px 20px 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge-welcome {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 28px;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            font-weight: 800;
+            color: #6B46C1;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            border: 3px solid #fff;
+            animation: bounceBadge 2.5s infinite ease-in-out;
+        }
+
+        .badge-welcome span { display: inline-block; animation: spinStar 4s infinite linear; }
+
+        h1 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 3.8rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            text-shadow: 3px 3px 0px #a18cd1, 6px 6px 0px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            line-height: 1.2;
+            animation: titleWave 4s infinite ease-in-out;
+        }
+
+        h1 span {
+            color: #F6E05E;
+            text-shadow: 3px 3px 0px #D69E2E, 6px 6px 0px rgba(0,0,0,0.1);
+            display: inline-block;
+            animation: pulseColor 3s infinite alternate;
+        }
+
+        @keyframes pulseColor {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05) rotate(2deg); }
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #2D3748;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 700;
+            background: rgba(255,255,255,0.6);
+            padding: 15px 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        /* ==================== 3. CÁC THẺ CẤP ĐỘ (CARDS) NHÚN NHẢY ==================== */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto 60px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            align-items: stretch;
+        }
+
+        .level-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 40px;
+            padding: 35px 25px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border: 5px solid #fff;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .level-card:hover {
+            transform: translateY(-20px) scale(1.03) rotate(1deg);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-lv1:hover { border-color: #9AE6B4; }
+        .card-lv2:hover { border-color: #FBD38D; }
+        .card-lv3:hover { border-color: #D6BCFA; }
+
+        .level-tag {
+            position: absolute;
+            top: 25px;
+            right: -35px;
+            transform: rotate(45deg);
+            width: 140px;
+            padding: 8px 0;
+            color: #FFF;
+            font-family: 'Baloo 2', cursive;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            letter-spacing: 2px;
+        }
+
+        .card-lv1 .level-tag { background: linear-gradient(90deg, #48BB78, #38A169); }
+        .card-lv2 .level-tag { background: linear-gradient(90deg, #ED8936, #DD6B20); }
+        .card-lv3 .level-tag { background: linear-gradient(90deg, #9F7AEA, #805AD5); }
+
+        /* Mascot giữ nguyên code SVG nhún nhảy */
+        .mascot-box {
+            height: 180px; display: flex; align-items: center; justify-content: center;
+            margin: 10px 0 25px; position: relative; transition: transform 0.4s ease;
+        }
+        .level-card:hover .mascot-box { transform: scale(1.15) rotate(-3deg); }
+
+        .anim-pc { animation: floatMascot 3.5s infinite ease-in-out; }
+        .anim-eyes { transform-origin: center; animation: blinkEyes 4s infinite; }
+        .anim-cloud { animation: cloudHover 4s infinite ease-in-out; }
+        .anim-wifi { transform-origin: bottom center; animation: wifiPulse 1.8s infinite ease-in-out; }
+        .anim-trophy { animation: trophyBounce 3s infinite ease-in-out; }
+        .anim-star-badge { transform-origin: center; animation: rotateStar 5s infinite linear; }
+
+        @keyframes floatMascot { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        @keyframes blinkEyes { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+        @keyframes cloudHover { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-12px) rotate(4deg); } }
+        @keyframes wifiPulse { 0% { transform: scale(0.9); opacity: 0.6; } 50% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.6; } }
+        @keyframes trophyBounce { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+        @keyframes rotateStar { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
+
+        /* ==================== 5. NỘI DUNG THẺ & NÚT BẤM ==================== */
+        .card-title { font-family: 'Baloo 2', cursive; font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+        .card-lv1 .card-title { color: #276749; }
+        .card-lv2 .card-title { color: #C05621; }
+        .card-lv3 .card-title { color: #6B46C1; }
+
+        .card-desc { font-size: 1.1rem; color: #4A5568; line-height: 1.6; margin-bottom: 25px; flex-grow: 1; font-weight: 600; }
+
+        .topics-list { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 30px; }
+        .topic-pill { font-size: 0.95rem; font-weight: 800; padding: 8px 16px; border-radius: 25px; transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .level-card:hover .topic-pill { transform: scale(1.1); }
+
+        .card-lv1 .topic-pill { background: #E6FFFA; color: #234E52; border: 2px solid #B2F5EA;}
+        .card-lv2 .topic-pill { background: #FFFAF0; color: #7B341E; border: 2px solid #FEEBC8;}
+        .card-lv3 .topic-pill { background: #FAF5FF; color: #44337A; border: 2px solid #E9D8FD;}
+
+        .btn-start {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 16px 24px; border-radius: 25px;
+            font-family: 'Baloo 2', cursive; font-size: 1.4rem; font-weight: 800;
+            color: #FFFFFF; border: none; cursor: pointer;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.15); transition: all 0.2s ease;
+            position: relative; overflow: hidden;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .btn-start::after {
+            content: ''; position: absolute; top: -50%; left: -60%;
+            width: 30px; height: 200%; background: rgba(255, 255, 255, 0.4);
+            transform: rotate(30deg); transition: all 0.6s;
+        }
+        .level-card:hover .btn-start::after { left: 120%; }
+
+        .card-lv1 .btn-start { background: linear-gradient(135deg, #48BB78, #38A169); box-shadow: 0 8px 0 #2F855A; }
+        .card-lv2 .btn-start { background: linear-gradient(135deg, #ED8936, #DD6B20); box-shadow: 0 8px 0 #C05621; }
+        .card-lv3 .btn-start { background: linear-gradient(135deg, #9F7AEA, #805AD5); box-shadow: 0 8px 0 #6B46C1; }
+
+        .level-card:active .btn-start { transform: translateY(6px); box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+
+        /* ==================== 6. GÓC NHẮC NHỞ & FOOTER ==================== */
+        .guide-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 35px; padding: 35px; margin-top: 50px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+            border: 4px dashed #fff;
+            display: flex; align-items: center; gap: 30px; flex-wrap: wrap;
+            transition: transform 0.3s ease;
+        }
+        .guide-section:hover { transform: translateY(-8px); border-color: #fbc2eb; }
+
+        .guide-icon {
+            flex-shrink: 0; width: 90px; height: 90px;
+            background: linear-gradient(135deg, #fbc2eb, #a18cd1);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; animation: pulseIcon 2s infinite ease-in-out;
+            color: #fff; box-shadow: 0 10px 20px rgba(161, 140, 209, 0.4);
+        }
+
+        @keyframes pulseIcon {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); box-shadow: 0 0 25px rgba(161, 140, 209, 0.6); }
+        }
+
+        .guide-content h3 { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #6B46C1; margin-bottom: 8px; }
+        .guide-content p { color: #4A5568; font-size: 1.1rem; line-height: 1.7; font-weight: 600; }
+
+        footer {
+            text-align: center; padding: 40px 20px; font-weight: 800;
+            color: #4A5568; font-size: 1.1rem; position: relative; z-index: 2;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .subtitle { font-size: 1.1rem; }
+            .guide-section { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Khung cảnh mây trôi nền chung -->
+    <div class="cloud-container">
+        <div class="fluffy-cloud c1"></div>
+        <div class="fluffy-cloud c2"></div>
+        <div class="fluffy-cloud c3"></div>
+        <div class="fluffy-cloud c4"></div>
+    </div>
+
+    <!-- ==================== LOCK SCREEN OVERLAY ==================== -->
+    <div id="lock-overlay">
+        <!-- Các biểu tượng dễ thương trang trí nền -->
+        <div class="lock-bg-icons">
+            <span class="lock-bg-icon bi-1">⭐</span>
+            <span class="lock-bg-icon bi-2">🎈</span>
+            <span class="lock-bg-icon bi-3">📚</span>
+            <span class="lock-bg-icon bi-4">✏️</span>
+            <!-- Liên kết bí mật -->
+            <a href="https://docs.google.com/spreadsheets/d/1Drf9oOfcg_m7A3KyK5ArH-YxbRIIYNWlq-sC2ccYQAU/edit?usp=sharing"
+               target="_blank" rel="noopener noreferrer"
+               class="lock-bg-icon bi-5" title="Khám phá kho báu">🌈</a>
+            <span class="lock-bg-icon bi-6">🐣</span>
+            <span class="lock-bg-icon bi-7">🎨</span>
+            <span class="lock-bg-icon bi-8">🖱️</span>
+            
+            <!-- BIỂU TƯỢNG MỚI ĐƯỢC THÊM VÀO KHOẢNG TRỐNG -->
+            <span class="lock-bg-icon bi-9">☁️</span>
+            <span class="lock-bg-icon bi-10">✨</span>
+            <span class="lock-bg-icon bi-11">☁️</span>
+            <span class="lock-bg-icon bi-12">🦄</span>
+            <span class="lock-bg-icon bi-13">🐳</span>
+            <span class="lock-bg-icon bi-14">☁️</span>
+            <span class="lock-bg-icon bi-15">🧸</span>
+            <span class="lock-bg-icon bi-16">🚀</span>
+            <span class="lock-bg-icon bi-17">🌟</span>
+            <span class="lock-bg-icon bi-18">🦋</span>
+            <span class="lock-bg-icon bi-19">🐶</span>
+            <span class="lock-bg-icon bi-20">🍭</span>
+            <span class="lock-bg-icon bi-21">☁️</span>
+            <span class="lock-bg-icon bi-22">🪐</span>
+            <span class="lock-bg-icon bi-23">🌈</span>
+        </div>
+        
+        <div class="lock-card">
+            <div class="lock-icon-wrap">🔐</div>
+            <h2 class="lock-title">Cánh Cửa Tri Thức</h2>
+            <p class="lock-desc">Các em hãy nhập mật khẩu bí mật của lớp học để mở khóa phòng máy nhé!</p>
+            <div class="input-group">
+                <input type="password" id="password-input" class="lock-input" placeholder="••••" maxlength="10" autocomplete="off">
+            </div>
+            <button type="button" id="unlock-btn" class="btn-unlock">
+                <span>Mở Khóa Ngay</span>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <div id="error-msg" class="error-message">❌ Mật khẩu chưa đúng rồi, em hãy thử lại nhé!</div>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div id="main-content-wrapper">
+        <!-- Header Section -->
+        <header>
+            <div class="badge-welcome">
+                <span>✨</span> Khám Phá Thế Giới Công Nghệ <span>✨</span>
+            </div>
+            <h1>HÀNH TRÌNH <span>IC3 SPARK</span></h1>
+            <p class="subtitle">
+                Chào mừng các em đến với phòng máy vui nhộn! Hãy chọn cấp độ bên dưới để bắt đầu học những kiến thức Tin học cực kỳ bổ ích nhé!
+            </p>
+        </header>
+
+        <!-- Main Navigation Levels -->
+        <main class="container">
+            <div class="levels-grid">
+                
+                <!-- LEVEL 1 -->
+                <a href="chon_bai_LV1.html" class="level-card card-lv1" id="card-lv1">
+                    <div class="level-tag">LV 1</div>
+                    <div class="mascot-box">
+                        <svg class="anim-pc" width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="20" y="25" width="100" height="70" rx="12" fill="#E6FFFA" stroke="#319795" stroke-width="6"/>
+                            <rect x="28" y="33" width="84" height="54" rx="8" fill="#319795"/>
+                            <g class="anim-eyes">
+                                <circle cx="55" cy="55" r="6" fill="#FFF"/>
+                                <circle cx="85" cy="55" r="6" fill="#FFF"/>
+                                <circle cx="57" cy="53" r="2" fill="#319795"/>
+                                <circle cx="87" cy="53" r="2" fill="#319795"/>
+                            </g>
+                            <path d="M60 68 C65 74 75 74 80 68" stroke="#FFF" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M55 100 H85 L90 115 H50 L55 100Z" fill="#319795"/>
+                            <rect x="40" y="115" width="60" height="8" rx="4" fill="#E6FFFA" stroke="#319795" stroke-width="4"/>
+                            <circle cx="15" cy="40" r="4" fill="#FBD38D"/>
+                            <circle cx="125" cy="30" r="6" fill="#FBD38D"/>
+                        </svg>
+                    </div>
+                    <h2 class="card-title">Cấp Độ 1: Khởi Động</h2>
+                    <p class="card-desc">
+                        Làm quen với máy tính, chuột, bàn phím và những bộ phận thông minh giúp các em học tập mỗi ngày!
+                    </p>
+                    <div class="topics-list">
+                        <span class="topic-pill">🖥️ Phần cứng</span>
+                        <span class="topic-pill">⌨️ Bàn phím</span>
+                        <span class="topic-pill">🖱️ Sử dụng chuột</span>
+                    </div>
+                    <button class="btn-start" type="button">
+                        <span>Khám Phá LV1</span>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </a>
+
+                <!-- LEVEL 2 -->
+                <a href="chon_bai_LV2.html" class="level-card card-lv2" id="card-lv2">
+                    <div class="level-tag">LV 2</div>
+                    <div class="mascot-box">
+                        <svg class="anim-cloud" width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40 95 C25 95 15 85 15 70 C15 55 28 45 42 47 C48 30 70 25 85 37 C95 32 110 38 115 50 C125 55 125 75 115 85 C112 92 102 95 95 95 Z" fill="#FFFAF0" stroke="#DD6B20" stroke-width="6" stroke-linejoin="round"/>
+                            <g class="anim-eyes">
+                                <circle cx="52" cy="62" r="6" fill="#DD6B20"/>
+                                <circle cx="82" cy="62" r="6" fill="#DD6B20"/>
+                                <circle cx="50" cy="60" r="2" fill="#FFF"/>
+                                <circle cx="80" cy="60" r="2" fill="#FFF"/>
+                            </g>
+                            <ellipse cx="42" cy="68" rx="5" ry="3" fill="#FEB2B2"/>
+                            <ellipse cx="92" cy="68" rx="5" ry="3" fill="#FEB2B2"/>
+                            <path d="M60 73 C65 80 69 80 74 73" stroke="#DD6B20" stroke-width="3" stroke-linecap="round"/>
+                            <path class="anim-wifi" d="M67 15 L70 5 L73 15 L83 18 L73 21 L70 31 L67 21 L57 18 Z" fill="#F6E05E"/>
+                            <circle cx="25" cy="25" r="5" fill="#48BB78"/>
+                            <circle cx="115" cy="20" r="4" fill="#4299E1"/>
+                        </svg>
+                    </div>
+                    <h2 class="card-title">Cấp Độ 2: Tăng Tốc</h2>
+                    <p class="card-desc">
+                        Học cách soạn thảo văn bản cơ bản, vẽ tranh sáng tạo và khám phá thế giới Internet rộng lớn!
+                    </p>
+                    <div class="topics-list">
+                        <span class="topic-pill">📝 Word / Paint</span>
+                        <span class="topic-pill">🌐 Internet</span>
+                        <span class="topic-pill">🔍 Tìm kiếm</span>
+                    </div>
+                    <button class="btn-start" type="button">
+                        <span>Khám Phá LV2</span>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </a>
+
+                <!-- LEVEL 3 -->
+                <a href="chon_bai_LV3.html" class="level-card card-lv3" id="card-lv3">
+                    <div class="level-tag">LV 3</div>
+                    <div class="mascot-box">
+                        <svg class="anim-trophy" width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40 35 H100 V60 C100 78 85 90 70 90 C55 90 40 78 40 60 V35 Z" fill="#FAF5FF" stroke="#805AD5" stroke-width="6" stroke-linejoin="round"/>
+                            <path d="M40 45 C25 45 25 70 40 70" stroke="#805AD5" stroke-width="6" stroke-linecap="round"/>
+                            <path d="M100 45 C115 45 115 70 100 70" stroke="#805AD5" stroke-width="6" stroke-linecap="round"/>
+                            <path d="M70 90 V110" stroke="#805AD5" stroke-width="8"/>
+                            <rect x="45" y="110" width="50" height="14" rx="4" fill="#FAF5FF" stroke="#805AD5" stroke-width="5"/>
+                            <g class="anim-eyes">
+                                <circle cx="60" cy="58" r="5" fill="#805AD5"/>
+                                <circle cx="80" cy="58" r="5" fill="#805AD5"/>
+                                <circle cx="59" cy="56" r="1.5" fill="#FFF"/>
+                                <circle cx="79" cy="56" r="1.5" fill="#FFF"/>
+                            </g>
+                            <path d="M66 68 C68 71 72 71 74 68" stroke="#805AD5" stroke-width="3" stroke-linecap="round"/>
+                            <path class="anim-star-badge" d="M70 15 L73 23 L81 23 L75 28 L77 36 L70 31 L63 36 L65 28 L59 23 L67 23 Z" fill="#ECC94B"/>
+                        </svg>
+                    </div>
+                    <h2 class="card-title">Cấp Độ 3: Chinh Phục</h2>
+                    <p class="card-desc">
+                        Trở thành công dân số thông thái, bảo vệ an toàn trên mạng và sẵn sàng chinh phục chứng chỉ IC3 Spark!
+                    </p>
+                    <div class="topics-list">
+                        <span class="topic-pill">🛡️ An toàn mạng</span>
+                        <span class="topic-pill">💡 Tư duy số</span>
+                        <span class="topic-pill">🏆 Ôn tập IC3</span>
+                    </div>
+                    <button class="btn-start" type="button">
+                        <span>Chinh Phục LV3</span>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </a>
+
+            </div>
+
+            <!-- Supportive Teachers Guide -->
+            <div class="guide-section">
+                <div class="guide-icon">💡</div>
+                <div class="guide-content">
+                    <h3>Góc Nhắc Nhở Cho Em</h3>
+                    <p>
+                        • Các em hãy hoàn thành lần lượt từ <strong>Cấp Độ 1 (LV1)</strong> đến <strong>Cấp Độ 3 (LV3)</strong> để nắm vững trọn vẹn bộ kỹ năng tin học.<br>
+                        • Nhấp vào thẻ từng bài học để di chuyển đến trang nội dung bài nhé. Chúc các em học thật vui và hái được nhiều sao!
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>🌟 Dự án Tin học IC3 Spark Tiểu Học • Vui học mỗi ngày 🌟</p>
+        </footer>
+    </div>
+
+    <!-- SCRIPT KIỂM TRA MẬT KHẨU -->
+    <script>
+        const CORRECT_PASSWORD_BASE64 = "4KKu";
+
+        const lockOverlay = document.getElementById("lock-overlay");
+        const mainContent = document.getElementById("main-content-wrapper");
+        const passwordInput = document.getElementById("password-input");
+        const unlockBtn = document.getElementById("unlock-btn");
+        const errorMsg = document.getElementById("error-msg");
+
+        function checkPassword() {
+            const userPassword = passwordInput.value;
+            const encodedInput = btoa(encodeURIComponent(userPassword));
+
+            if (encodedInput === CORRECT_PASSWORD_BASE64) {
+                // Thêm hiệu ứng bay lên khi mở khóa thành công
+                lockOverlay.style.transform = "translateY(-100%)";
+                lockOverlay.style.opacity = "0";
+                setTimeout(() => {
+                    lockOverlay.style.visibility = "hidden";
+                    mainContent.style.display = "block";
+                }, 400);
+            } else {
+                errorMsg.style.display = "block";
+                passwordInput.style.borderColor = "#E53E3E";
+                passwordInput.value = "";
+                passwordInput.focus();
+            }
+        }
+
+        unlockBtn.addEventListener("click", checkPassword);
+
+        passwordInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                checkPassword();
+            }
+        });
+
+        window.onload = function() {
+            passwordInput.focus();
+        };
+    </script>
+</body>
+</html>

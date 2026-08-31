@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn bài ôn tập IC3 - Thế giới Hoạt Hình</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pastel-blue: #a8d5ff;
+            --pastel-pink: #ffb8d1;
+            --pastel-yellow: #ffebb3;
+            --pastel-green: #b5ebb5;
+            --pastel-purple: #dcb5ff;
+            --dark-text: #5d4037;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: 'Baloo 2', cursive;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            overflow: auto; /* Cho phép cuộn nếu màn hình nhỏ */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark-text);
+        }
+
+        /* ----- Phông nền mây trôi (Animated Clouds) ----- */
+        .cloud {
+            position: fixed;
+            background: white;
+            border-radius: 50px;
+            box-shadow: inset 0px -5px 0px rgba(0,0,0,0.05);
+            animation: floatClouds linear infinite;
+            z-index: -1;
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+        .cloud1 { width: 120px; height: 40px; top: 10%; left: -150px; animation-duration: 25s; }
+        .cloud1::before { width: 50px; height: 50px; top: -25px; left: 15px; }
+        .cloud1::after { width: 70px; height: 70px; top: -35px; right: 15px; }
+
+        .cloud2 { width: 180px; height: 60px; top: 30%; left: -200px; animation-duration: 35s; animation-delay: 5s; opacity: 0.8;}
+        .cloud2::before { width: 70px; height: 70px; top: -35px; left: 20px; }
+        .cloud2::after { width: 90px; height: 90px; top: -45px; right: 20px; }
+
+        .cloud3 { width: 100px; height: 35px; top: 70%; left: -120px; animation-duration: 20s; animation-delay: 10s; opacity: 0.9;}
+        .cloud3::before { width: 40px; height: 40px; top: -20px; left: 15px; }
+        .cloud3::after { width: 50px; height: 50px; top: -25px; right: 15px; }
+
+        @keyframes floatClouds {
+            from { transform: translateX(-20vw); }
+            to { transform: translateX(120vw); }
+        }
+
+        /* ----- Container chính ----- */
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15), inset 0 0 0 8px white, inset 0 0 0 12px var(--pastel-yellow);
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 20px 0;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            color: #ff6b6b;
+            font-size: 40px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px #ffeaa7;
+            font-weight: 800;
+            letter-spacing: 2px;
+            animation: wiggle 3s infinite;
+        }
+        
+        .section-title {
+            color: #6c5ce7;
+            font-size: 26px;
+            margin-bottom: 15px;
+            margin-top: 10px;
+            text-shadow: 1px 1px 0px #dcb5ff;
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+
+        /* ----- Grid Lựa chọn chung ----- */
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .option-card {
+            position: relative;
+        }
+
+        .option-card input[type="radio"] {
+            display: none;
+        }
+
+        .option-label {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid transparent;
+            box-shadow: 0 10px 0px rgba(0,0,0,0.1), 0 15px 15px rgba(0,0,0,0.1);
+            color: #fff;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ----- Kích thước riêng cho Bài học và Chế độ ----- */
+        .lesson-label {
+            width: 110px;
+            height: 120px;
+            font-size: 28px;
+        }
+
+        .mode-label {
+            width: 180px;
+            height: 100px;
+            font-size: 24px;
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        .option-icon {
+            font-size: 40px;
+            transition: transform 0.3s;
+        }
+        
+        .mode-label .option-icon {
+            font-size: 35px;
+            margin-bottom: 0;
+        }
+
+        /* Màu sắc cho Bài học */
+        .lesson-card:nth-child(1) .lesson-label { background-color: #74b9ff; box-shadow: 0 10px 0px #0984e3; text-shadow: 2px 2px 0 #0984e3;}
+        .lesson-card:nth-child(2) .lesson-label { background-color: #55efc4; box-shadow: 0 10px 0px #00b894; text-shadow: 2px 2px 0 #00b894;}
+        .lesson-card:nth-child(3) .lesson-label { background-color: #ffeaa7; color: #d63031; box-shadow: 0 10px 0px #fdcb6e; text-shadow: 2px 2px 0 #fdcb6e;}
+        .lesson-card:nth-child(4) .lesson-label { background-color: #a29bfe; box-shadow: 0 10px 0px #6c5ce7; text-shadow: 2px 2px 0 #6c5ce7;}
+        .lesson-card:nth-child(5) .lesson-label { background-color: #fab1a0; box-shadow: 0 10px 0px #e17055; text-shadow: 2px 2px 0 #e17055;}
+
+        /* Màu sắc cho Chế độ */
+        .mode-card:nth-child(1) .mode-label { background-color: #48dbfb; box-shadow: 0 10px 0px #0abde3; text-shadow: 2px 2px 0 #0abde3;}
+        .mode-card:nth-child(2) .mode-label { background-color: #ff9ff3; box-shadow: 0 10px 0px #f368e0; text-shadow: 2px 2px 0 #f368e0;}
+
+        /* Hover Effect */
+        .option-label:hover {
+            transform: translateY(-8px) scale(1.05);
+            filter: brightness(1.1);
+        }
+        .option-label:hover .option-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        /* Active/Checked Effect */
+        .option-card input[type="radio"]:checked + .option-label {
+            transform: scale(1.15) translateY(-5px);
+            border: 5px solid #fff;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+            animation: bounceSelect 0.5s;
+        }
+        .option-card input[type="radio"]:checked + .option-label .option-icon {
+            animation: spin 1s;
+        }
+
+        @keyframes bounceSelect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+            100% { transform: scale(1.15) translateY(-5px); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1.2); }
+        }
+
+        /* ----- Nút Submit ----- */
+        .submit-btn {
+            background: linear-gradient(to right, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            color: #d63031;
+            border: 4px solid #fff;
+            padding: 15px 50px;
+            font-size: 28px;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 10px 0px #ff7675, 0 15px 20px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: pulseBtn 2s infinite;
+            margin-top: 10px;
+        }
+
+        @keyframes pulseBtn {
+            0% { box-shadow: 0 10px 0px #ff7675, 0 15px 20px rgba(0,0,0,0.2), 0 0 0 0 rgba(255, 118, 117, 0.7); }
+            70% { box-shadow: 0 10px 0px #ff7675, 0 15px 20px rgba(0,0,0,0.2), 0 0 0 20px rgba(255, 118, 117, 0); }
+            100% { box-shadow: 0 10px 0px #ff7675, 0 15px 20px rgba(0,0,0,0.2), 0 0 0 0 rgba(255, 118, 117, 0); }
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: linear-gradient(to right, #fecfef 0%, #ff9a9e 100%);
+        }
+
+        .submit-btn:active {
+            transform: translateY(10px);
+            box-shadow: 0 0px 0px #ff7675;
+            animation: none;
+        }
+
+        /* ----- Modal Popup Custom ----- */
+        #customAlert {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            border: 8px solid #a29bfe;
+            animation: popIn 0.5s;
+            max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 {
+            color: #6c5ce7;
+            font-size: 32px;
+            margin-top: 0;
+        }
+        .modal-icon {
+            font-size: 80px;
+            margin-bottom: 10px;
+            animation: wiggle 2s infinite;
+        }
+        .close-btn {
+            margin-top: 20px;
+            background: #55efc4;
+            color: #00b894;
+            border: none;
+            padding: 12px 35px;
+            font-size: 22px;
+            font-weight: bold;
+            font-family: inherit;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #00b894;
+        }
+        .close-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 #00b894;
+        }
+        
+        /* Mascot trang trí */
+        .mascot {
+            position: absolute;
+            font-size: 80px;
+            z-index: 20;
+        }
+        .mascot-left {
+            bottom: -30px;
+            left: -40px;
+            animation: floatUpDown 3s ease-in-out infinite alternate;
+        }
+        .mascot-right {
+            top: -40px;
+            right: -30px;
+            animation: floatUpDown 4s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes floatUpDown {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-20px); }
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Mây trôi nền -->
+<div class="cloud cloud1"></div>
+<div class="cloud cloud2"></div>
+<div class="cloud cloud3"></div>
+
+<div class="container">
+    <div class="mascot mascot-left">🐶</div>
+    <div class="mascot mascot-right">🦄</div>
+    
+    <h1>✨ Thử thách IC3 ✨</h1>
+    
+    <form action="#" id="lessonForm">
+        
+        <!-- Phần 1: Chọn Chế độ -->
+        <h2 class="section-title">🎯 1. Chọn chế độ:</h2>
+        <div class="options-grid">
+            <div class="option-card mode-card">
+                <!-- Chế độ Luyện tập mặc định được chọn (checked) -->
+                <input type="radio" id="mode_training" name="mode" value="training" required checked>
+                <label class="option-label mode-label" for="mode_training">
+                    <span class="option-icon">🎮</span>
+                    TRAINING
+                </label>
+            </div>
+            <div class="option-card mode-card">
+                <input type="radio" id="mode_testing" name="mode" value="testing">
+                <label class="option-label mode-label" for="mode_testing">
+                    <span class="option-icon">🏆</span>
+                    TESTING
+                </label>
+            </div>
+        </div>
+
+        <!-- Phần 2: Chọn Bài học -->
+        <h2 class="section-title">📚 2. Chọn bài học:</h2>
+        <div class="options-grid">
+            <div class="option-card lesson-card">
+                <input type="radio" id="ot1" name="lesson" value="OT1" required>
+                <label class="option-label lesson-label" for="ot1">
+                    <span class="option-icon">🦁</span>
+                    OT1
+                </label>
+            </div>
+            <div class="option-card lesson-card">
+                <input type="radio" id="ot2" name="lesson" value="OT2">
+                <label class="option-label lesson-label" for="ot2">
+                    <span class="option-icon">🐸</span>
+                    OT2
+                </label>
+            </div>
+            <div class="option-card lesson-card">
+                <input type="radio" id="ot3" name="lesson" value="OT3">
+                <label class="option-label lesson-label" for="ot3">
+                    <span class="option-icon">🐰</span>
+                    OT3
+                </label>
+            </div>
+            <div class="option-card lesson-card">
+                <input type="radio" id="OT4" name="lesson" value="OT4">
+                <label class="option-label lesson-label" for="OT4">
+                    <span class="option-icon">🐧</span>
+                    OT4
+                </label>
+            </div>
+            <div class="option-card lesson-card">
+                <input type="radio" id="OT5" name="lesson" value="OT5">
+                <label class="option-label lesson-label" for="OT5">
+                    <span class="option-icon">🐼</span>
+                    OT5
+                </label>
+            </div>
+        </div>
+        
+        <button type="submit" class="submit-btn">Bắt đầu ngay! 🚀</button>
+    </form>
+</div>
+
+<!-- Modal Thông báo dễ thương -->
+<div id="customAlert">
+    <div class="modal-content">
+        <div class="modal-icon">🎉</div>
+        <h2 id="alertTitle">Tuyệt cú mèo!</h2>
+        <p id="alertMessage" style="font-size: 22px;">Em đã chọn bài ...</p>
+        <button class="close-btn" onclick="goToLesson()">Vào làm bài thôi!</button>
+    </div>
+</div>
+
+<script>
+    // ========================================================
+    // BẠN SỬA ĐƯỜNG LINK Ở PHẦN NÀY NHÉ:
+    // MỖI CHẾ ĐỘ SẼ CÓ MỘT BỘ LINK RIÊNG
+    // ========================================================
+    const lessonLinks = {
+        // --- CHẾ ĐỘ LUYỆN TẬP (TRAINING) ---
+        'training': {
+            'OT1': 'lv3_ot1_training.html', 
+            'OT2': 'lv3_ot2_training.html',
+            'OT3': 'lv3_ot3_training.html',
+            'OT4': 'lv4_ot4_training.html',
+            'OT5': 'lv5_ot5_training.html'
+        },
+        // --- CHẾ ĐỘ THI THỬ (TESTING) ---
+        'testing': {
+            'OT1': 'lv3_ot1_testing.html', 
+            'OT2': 'lv3_ot2_testing.html',
+            'OT3': 'lv3_ot3_testing.html',
+            'OT4': 'lv4_ot4_testing.html',
+            'OT5': 'lv5_ot5_testing.html'
+        }
+    };
+
+    // Tên hiển thị trên hộp thoại thông báo cho từng chế độ
+    const modeDisplayNames = {
+        'training': 'Training 🎮',
+        'testing': 'Testing 🏆'
+    };
+    
+    let currentLink = '';
+
+    document.getElementById('lessonForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Lấy dữ liệu từ cả 2 lựa chọn: Chế độ và Bài học
+        const selectedMode = document.querySelector('input[name="mode"]:checked');
+        const selectedLesson = document.querySelector('input[name="lesson"]:checked');
+        
+        if(selectedMode && selectedLesson) {
+            // Xác định link dựa trên chế độ + bài học
+            currentLink = lessonLinks[selectedMode.value][selectedLesson.value];
+            
+            // Lấy tên hiển thị của chế độ
+            const modeName = modeDisplayNames[selectedMode.value];
+
+            // Cập nhật thông báo
+            document.getElementById('alertMessage').innerHTML = 
+                'Em đã chọn <b>' + selectedLesson.value + '</b><br> Chế độ: <b>' + modeName + '</b>.<br>Chúc em làm bài thật tốt nhé!';
+            
+            // Hiển thị modal
+            document.getElementById('customAlert').style.display = 'flex';
+        }
+    });
+
+    function goToLesson() {
+        if(currentLink) {
+            window.location.href = currentLink;
+        } else {
+            document.getElementById('customAlert').style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
