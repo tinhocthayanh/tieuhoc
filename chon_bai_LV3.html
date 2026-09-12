@@ -393,8 +393,8 @@
 </div>
 
 <!-- Modal Thông báo dễ thương -->
-<div id="customAlert">
-    <div class="modal-content">
+<div id="customAlert" onclick="closeModalOutside(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-icon">🎉</div>
         <h2 id="alertTitle">Tuyệt cú mèo!</h2>
         <p id="alertMessage" style="font-size: 22px;">Em đã chọn bài ...</p>
@@ -413,16 +413,16 @@
             'OT1': 'lv3_ot1_training.html', 
             'OT2': 'lv3_ot2_training.html',
             'OT3': 'lv3_ot3_training.html',
-            'OT4': 'lv4_ot4_training.html',
-            'OT5': 'lv5_ot5_training.html'
+            'OT4': 'lv3_ot4_training.html',
+            'OT5': 'lv3_ot5_training.html'
         },
         // --- CHẾ ĐỘ THI THỬ (TESTING) ---
         'testing': {
             'OT1': 'lv3_ot1_testing.html', 
             'OT2': 'lv3_ot2_testing.html',
             'OT3': 'lv3_ot3_testing.html',
-            'OT4': 'lv4_ot4_testing.html',
-            'OT5': 'lv5_ot5_testing.html'
+            'OT4': 'lv3_ot4_testing.html',
+            'OT5': 'lv3_ot5_testing.html'
         }
     };
 
@@ -462,6 +462,29 @@
             window.location.href = currentLink;
         } else {
             document.getElementById('customAlert').style.display = 'none';
+        }
+    }
+
+    // Reset lại form về trạng thái ban đầu:
+    // - Chế độ: quay về TRAINING (mặc định)
+    // - Bài học: bỏ chọn hết
+    function resetLessonForm() {
+        document.getElementById('mode_training').checked = true;
+        document.getElementById('mode_testing').checked = false;
+
+        document.querySelectorAll('input[name="lesson"]').forEach(function(input) {
+            input.checked = false;
+        });
+
+        currentLink = '';
+    }
+
+    // Khi bấm vào vùng nền mờ bên ngoài hộp thoại (không bấm vào nội dung modal)
+    // thì tự đóng modal và reset lại các lựa chọn
+    function closeModalOutside(event) {
+        if(event.target === document.getElementById('customAlert')) {
+            document.getElementById('customAlert').style.display = 'none';
+            resetLessonForm();
         }
     }
 </script>

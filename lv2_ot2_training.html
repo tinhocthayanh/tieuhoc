@@ -2842,7 +2842,8 @@ document.getElementById('btnRetry').addEventListener('click', () => {
     studentSchool: prevSchool,
     isLoggedIn: true,
     hasSubmitted: false,
-    feedbackShown: false
+    feedbackShown: false,
+    lockedQuestions: {}
   };
   initShuffleOrders();
   document.getElementById('resultScreen').classList.add('hidden');

@@ -413,8 +413,8 @@
             'OT1': 'lv1_ot1_training.html', 
             'OT2': 'lv1_ot2_training.html',
             'OT3': 'lv1_ot3_training.html',
-            'GM1': 'lv1.html',
-            'GM2': 'lv1_ot2_training.html'
+            'GM1': 'temp2_matrix_login_smooth.html',
+            'GM2': 'temp2_matrix_login_smooth.html'
         },
         // --- CHẾ ĐỘ THI THỬ (TESTING) ---
         'testing': {
@@ -432,7 +432,7 @@
         'testing': 'Testing 🏆'
     };
     
-    let currentLink = '';
+    let currentLink = 'chon_bai_LV1.html';
 
     document.getElementById('lessonForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -464,6 +464,27 @@
             document.getElementById('customAlert').style.display = 'none';
         }
     }
+
+    // Reset lại form về trạng thái ban đầu: Chế độ "Luyện tập" được chọn, chưa chọn bài học nào
+    function resetForm() {
+        document.getElementById('mode_training').checked = true;
+        document.getElementById('mode_testing').checked = false;
+
+        document.querySelectorAll('input[name="lesson"]').forEach(function(input) {
+            input.checked = false;
+        });
+
+        currentLink = 'chon_bai_LV1.html';
+    }
+
+    // Đóng modal + reset lựa chọn khi bấm vào vùng nền mờ bên ngoài hộp thoại
+    document.getElementById('customAlert').addEventListener('click', function(e) {
+        // Chỉ xử lý khi bấm đúng vào vùng nền (không phải nội dung modal bên trong)
+        if(e.target === this) {
+            this.style.display = 'none';
+            resetForm();
+        }
+    });
 </script>
 </body>
 </html>
