@@ -171,6 +171,8 @@
         .lesson-card:nth-child(3) .lesson-label { background-color: #ffeaa7; color: #d63031; box-shadow: 0 10px 0px #fdcb6e; text-shadow: 2px 2px 0 #fdcb6e;}
         .lesson-card:nth-child(4) .lesson-label { background-color: #a29bfe; box-shadow: 0 10px 0px #6c5ce7; text-shadow: 2px 2px 0 #6c5ce7;}
         .lesson-card:nth-child(5) .lesson-label { background-color: #fab1a0; box-shadow: 0 10px 0px #e17055; text-shadow: 2px 2px 0 #e17055;}
+        #GM1 + .lesson-label { background-color: #a29bfe; box-shadow: 0 10px 0px #6c5ce7; text-shadow: 2px 2px 0 #6c5ce7;}
+        #GM2 + .lesson-label { background-color: #fab1a0; box-shadow: 0 10px 0px #e17055; text-shadow: 2px 2px 0 #e17055;}
 
         /* Màu sắc cho Chế độ */
         .mode-card:nth-child(1) .mode-label { background-color: #48dbfb; box-shadow: 0 10px 0px #0abde3; text-shadow: 2px 2px 0 #0abde3;}
@@ -386,6 +388,20 @@
                     OT5
                 </label>
             </div>
+            <div class="option-card lesson-card">
+                <input type="radio" id="GM1" name="lesson" value="GM1">
+                <label class="option-label lesson-label" for="GM1">
+                    <span class="option-icon">🐯</span>
+                    GM1
+                </label>
+            </div>
+            <div class="option-card lesson-card">
+                <input type="radio" id="GM2" name="lesson" value="GM2">
+                <label class="option-label lesson-label" for="GM2">
+                    <span class="option-icon">🦎</span>
+                    GM2
+                </label>
+            </div>
         </div>
         
         <button type="submit" class="submit-btn">Bắt đầu ngay! 🚀</button>
@@ -393,8 +409,8 @@
 </div>
 
 <!-- Modal Thông báo dễ thương -->
-<div id="customAlert" onclick="closeModalOutside(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
+<div id="customAlert">
+    <div class="modal-content">
         <div class="modal-icon">🎉</div>
         <h2 id="alertTitle">Tuyệt cú mèo!</h2>
         <p id="alertMessage" style="font-size: 22px;">Em đã chọn bài ...</p>
@@ -414,7 +430,9 @@
             'OT2': 'lv2_ot2_training.html',
             'OT3': 'lv2_ot3_training.html',
             'OT4': 'lv2_ot4_training.html',
-            'OT5': 'lv2_ot5_training.html'
+            'OT5': 'lv2_ot5_training.html',
+            'GM1': 'lv2_gm1_training.html',
+            'GM2': 'lv2_gm2_training.html'
         },
         // --- CHẾ ĐỘ THI THỬ (TESTING) ---
         'testing': {
@@ -422,7 +440,9 @@
             'OT2': 'lv2_ot2_testing.html',
             'OT3': 'lv2_ot3_testing.html',
             'OT4': 'lv2_ot4_testing.html',
-            'OT5': 'lv2_ot5_testing.html'
+            'OT5': 'lv2_ot5_testing.html',
+            'GM1': 'lv2_gm1_testing.html',
+            'GM2': 'lv2_gm2_testing.html'
         }
     };
 
@@ -462,29 +482,6 @@
             window.location.href = currentLink;
         } else {
             document.getElementById('customAlert').style.display = 'none';
-        }
-    }
-
-    // Reset lại form về trạng thái ban đầu:
-    // - Chế độ: quay về TRAINING (mặc định)
-    // - Bài học: bỏ chọn hết
-    function resetLessonForm() {
-        document.getElementById('mode_training').checked = true;
-        document.getElementById('mode_testing').checked = false;
-
-        document.querySelectorAll('input[name="lesson"]').forEach(function(input) {
-            input.checked = false;
-        });
-
-        currentLink = '';
-    }
-
-    // Khi bấm vào vùng nền mờ bên ngoài hộp thoại (không bấm vào nội dung modal)
-    // thì tự đóng modal và reset lại các lựa chọn
-    function closeModalOutside(event) {
-        if(event.target === document.getElementById('customAlert')) {
-            document.getElementById('customAlert').style.display = 'none';
-            resetLessonForm();
         }
     }
 </script>
